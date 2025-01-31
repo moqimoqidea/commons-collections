@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
- * This package contains implementations of the
+ * Implements the
  * {@link org.apache.commons.collections4.Closure Closure},
  * {@link org.apache.commons.collections4.Predicate Predicate},
  * {@link org.apache.commons.collections4.Transformer Transformer} and
  * {@link org.apache.commons.collections4.Factory Factory} interfaces.
  * These provide simple callbacks for processing with collections.
  * <p>
- * <b>WARNING:</b> from v4.1 onwards several unsafe classes in this package
+ * <strong>WARNING:</strong> from v4.1 onwards several unsafe classes in this package
  * will not be serializable anymore in order to prevent potential remote
  * code execution exploits.
  * <p>

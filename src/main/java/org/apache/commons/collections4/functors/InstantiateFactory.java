@@ -26,12 +26,13 @@ import org.apache.commons.collections4.FunctorException;
 /**
  * Factory implementation that creates a new object instance by reflection.
  * <p>
- * <b>WARNING:</b> from v4.1 onwards this class will <b>not</b> be serializable anymore
+ * <strong>WARNING:</strong> from v4.1 onwards this class will <strong>not</strong> be serializable anymore
  * in order to prevent potential remote code execution exploits. Please refer to
  * <a href="https://issues.apache.org/jira/browse/COLLECTIONS-580">COLLECTIONS-580</a>
  * for more details.
  * </p>
  *
+ * @param <T> the type of results supplied by this supplier.
  * @since 3.0
  */
 public class InstantiateFactory<T> implements Factory<T> {

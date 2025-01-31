@@ -104,11 +104,11 @@ public final class UnmodifiableQueue<E>
     }
 
     /**
-     * Read the collection in using a custom routine.
+     * Deserializes the collection in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an I/O error occurs while reading from the input stream
-     * @throws ClassNotFoundException if the class of a serialized object can not be found
+     * @throws ClassNotFoundException if the class of a serialized object cannot be found
      */
     @SuppressWarnings("unchecked")
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -145,10 +145,10 @@ public final class UnmodifiableQueue<E>
     }
 
     /**
-     * Write the collection out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an I/O error occurs while writing to the output stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

@@ -28,11 +28,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the ObjectArrayListIterator class.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class ObjectArrayListIteratorTest<E> extends ObjectArrayIteratorTest<E> {
-
-    public ObjectArrayListIteratorTest() {
-    }
 
     public ObjectArrayListIterator<E> makeArrayListIterator(final E[] array) {
         return new ObjectArrayListIterator<>(array);
@@ -57,30 +56,19 @@ public class ObjectArrayListIteratorTest<E> extends ObjectArrayIteratorTest<E> {
     @Test
     public void testListIterator() {
         final ListIterator<E> iter = makeObject();
-
         // TestArrayIterator#testIterator() has already tested the iterator forward,
         //  now we need to test it in reverse
-
         // fast-forward the iterator to the end...
         while (iter.hasNext()) {
             iter.next();
         }
-
         for (int x = testArray.length - 1; x >= 0; x--) {
             final Object testValue = testArray[x];
             final Object iterValue = iter.previous();
-
             assertEquals(testValue, iterValue, "Iteration value is correct");
         }
-
         assertFalse(iter.hasPrevious(), "Iterator should now be empty");
-
-        try {
-            iter.previous();
-        } catch (final Exception e) {
-            assertEquals(e.getClass(), new NoSuchElementException().getClass(), "NoSuchElementException must be thrown");
-        }
-
+        assertThrows(NoSuchElementException.class, iter::previous);
     }
 
     /**

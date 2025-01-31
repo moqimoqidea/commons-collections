@@ -29,12 +29,11 @@ import org.junit.jupiter.api.Test;
 /**
  * Extension of {@link AbstractOrderedMapTest} for exercising the
  * {@link UnmodifiableOrderedMap} implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class UnmodifiableOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
-
-    public UnmodifiableOrderedMapTest() {
-        super(UnmodifiableOrderedMapTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {

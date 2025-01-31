@@ -37,10 +37,11 @@ public interface ListValuedMap<K, V> extends MultiValuedMap<K, V> {
     /**
      * Gets the list of values associated with the specified key.
      * <p>
-     * This method will return an <b>empty</b> list if
+     * This method will return an <strong>empty</strong> list if
      * {@link #containsKey(Object)} returns {@code false}. Changes to the
      * returned list will update the underlying {@code ListValuedMap} and
      * vice-versa.
+     * </p>
      *
      * @param key  the key to retrieve
      * @return the {@code List} of values, implementations should return an
@@ -53,9 +54,10 @@ public interface ListValuedMap<K, V> extends MultiValuedMap<K, V> {
     /**
      * Removes all values associated with the specified key.
      * <p>
-     * The returned list <i>may</i> be modifiable, but updates will not be
+     * The returned list <em>may</em> be modifiable, but updates will not be
      * propagated to this list-valued map. In case no mapping was stored for the
      * specified key, an empty, unmodifiable list will be returned.
+     * </p>
      *
      * @param key  the key to remove values from
      * @return the {@code List} of values removed, implementations

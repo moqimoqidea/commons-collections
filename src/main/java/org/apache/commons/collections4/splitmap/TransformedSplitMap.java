@@ -62,7 +62,6 @@ import org.apache.commons.collections4.map.LinkedMap;
  * @param <U> the type of the values to put in this map
  * @param <V> the type of the values to get in this map
  * @since 4.0
- *
  * @see org.apache.commons.collections4.SplitMapUtils#readableMap(org.apache.commons.collections4.Get)
  * @see org.apache.commons.collections4.SplitMapUtils#writableMap(Put)
  */
@@ -124,7 +123,7 @@ public class TransformedSplitMap<J, K, U, V> extends AbstractIterableGetMapDecor
      * @return the transformed value
      */
     protected V checkSetValue(final U value) {
-        return valueTransformer.transform(value);
+        return valueTransformer.apply(value);
     }
 
     @Override
@@ -143,11 +142,11 @@ public class TransformedSplitMap<J, K, U, V> extends AbstractIterableGetMapDecor
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      * @since 3.1
      */
     @SuppressWarnings("unchecked") // (1) should only fail if input stream is incorrect
@@ -165,7 +164,7 @@ public class TransformedSplitMap<J, K, U, V> extends AbstractIterableGetMapDecor
      * @return the transformed object
      */
     protected K transformKey(final J object) {
-        return keyTransformer.transform(object);
+        return keyTransformer.apply(object);
     }
 
     /**
@@ -198,14 +197,14 @@ public class TransformedSplitMap<J, K, U, V> extends AbstractIterableGetMapDecor
      * @return the transformed object
      */
     protected V transformValue(final U object) {
-        return valueTransformer.transform(object);
+        return valueTransformer.apply(object);
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

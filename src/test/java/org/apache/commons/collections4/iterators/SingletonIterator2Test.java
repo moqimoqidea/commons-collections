@@ -18,6 +18,7 @@ package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Iterator;
@@ -29,14 +30,12 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests the SingletonIterator to ensure that the next() method will actually
  * perform the iteration rather than the hasNext() method.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class SingletonIterator2Test<E> extends AbstractIteratorTest<E> {
 
     private static final Object testValue = "foo";
-
-    public SingletonIterator2Test() {
-        super(SingletonIterator2Test.class.getSimpleName());
-    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -68,17 +67,10 @@ public class SingletonIterator2Test<E> extends AbstractIteratorTest<E> {
     public void testIterator() {
         final Iterator<E> iter = makeObject();
         assertTrue(iter.hasNext(), "Iterator has a first item");
-
         final E iterValue = iter.next();
         assertEquals(testValue, iterValue, "Iteration value is correct");
-
         assertFalse(iter.hasNext(), "Iterator should now be empty");
-
-        try {
-            iter.next();
-        } catch (final Exception e) {
-            assertEquals(e.getClass(), new NoSuchElementException().getClass(), "NoSuchElementException must be thrown");
-        }
+        assertThrows(NoSuchElementException.class, iter::next);
     }
 
     @Test

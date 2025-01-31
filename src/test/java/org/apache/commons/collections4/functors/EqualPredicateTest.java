@@ -16,8 +16,6 @@
  */
 package org.apache.commons.collections4.functors;
 
-import static org.apache.commons.collections4.functors.EqualPredicate.equalPredicate;
-import static org.apache.commons.collections4.functors.NullPredicate.nullPredicate;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.apache.commons.collections4.Predicate;
@@ -36,31 +34,35 @@ public class EqualPredicateTest extends AbstractPredicateTest {
             return b;
         }
     }
+
     private static final EqualsTestObject FALSE_OBJECT = new EqualsTestObject(false);
 
     private static final EqualsTestObject TRUE_OBJECT = new EqualsTestObject(true);
 
     @Override
     protected Predicate<Object> generatePredicate() {
-        return equalPredicate(null);
+        return EqualPredicate.equalPredicate(null);
     }
 
     @Test
     public void testNullArgumentEqualsNullPredicate() throws Exception {
-        assertSame(nullPredicate(), equalPredicate(null));
+        assertSame(NullPredicate.nullPredicate(), EqualPredicate.equalPredicate(null));
     }
 
     @Test
     public void testObjectFactoryUsesEqualsForTest() throws Exception {
-        final Predicate<EqualsTestObject> predicate = equalPredicate(FALSE_OBJECT);
-        assertPredicateFalse(predicate, FALSE_OBJECT);
-        assertPredicateTrue(equalPredicate(TRUE_OBJECT), TRUE_OBJECT);
+        final Predicate<EqualsTestObject> predicate = EqualPredicate.equalPredicate(FALSE_OBJECT);
+        assertPredicateFalse(predicate, null);
+        assertPredicateFalse(predicate, TRUE_OBJECT); // different object
+        assertPredicateTrue(predicate, FALSE_OBJECT); // the same object
+        assertPredicateFalse(predicate, new EqualsTestObject(false)); // different object but always returns false from equals()
+        assertPredicateTrue(EqualPredicate.equalPredicate(TRUE_OBJECT), TRUE_OBJECT);
     }
 
     @SuppressWarnings("boxing")
     @Test
     public void testPredicateTypeCanBeSuperClassOfObject() throws Exception {
-        final Predicate<Number> predicate = equalPredicate((Number) 4);
+        final Predicate<Number> predicate = EqualPredicate.equalPredicate((Number) 4);
         assertPredicateTrue(predicate, 4);
     }
 }

@@ -45,8 +45,20 @@ public class IteratorChainTest extends AbstractIteratorTest<String> {
     protected List<String> list2;
     protected List<String> list3;
 
-    public IteratorChainTest() {
-        super(IteratorChainTest.class.getSimpleName());
+    public List<String> getList1() {
+        return list1;
+    }
+
+    public List<String> getList2() {
+        return list2;
+    }
+
+    public List<String> getList3() {
+        return list3;
+    }
+
+    public String[] getTestArray() {
+        return testArray;
     }
 
     @Override
@@ -58,7 +70,6 @@ public class IteratorChainTest extends AbstractIteratorTest<String> {
     @Override
     public IteratorChain<String> makeObject() {
         final IteratorChain<String> chain = new IteratorChain<>();
-
         chain.addIterator(list1.iterator());
         chain.addIterator(list2.iterator());
         chain.addIterator(list3.iterator());
@@ -76,6 +87,21 @@ public class IteratorChainTest extends AbstractIteratorTest<String> {
         list3 = new ArrayList<>();
         list3.add("Five");
         list3.add("Six");
+    }
+
+    @Test
+    public void testConstructList() {
+        final List<Iterator<String>> list = new ArrayList<>();
+        list.add(list1.iterator());
+        list.add(list2.iterator());
+        list.add(list3.iterator());
+        final List<String> expected = new ArrayList<>(list1);
+        expected.addAll(list2);
+        expected.addAll(list3);
+        final IteratorChain<String> iter = new IteratorChain<>(list);
+        final List<String> actual = new ArrayList<>();
+        iter.forEachRemaining(actual::add);
+        assertEquals(actual, expected);
     }
 
     @Test
@@ -112,37 +138,24 @@ public class IteratorChainTest extends AbstractIteratorTest<String> {
         final Iterator<String> iter = makeObject();
         for (final String testValue : testArray) {
             final Object iterValue = iter.next();
-
             assertEquals(testValue, iterValue, "Iteration value is correct");
         }
-
         assertFalse(iter.hasNext(), "Iterator should now be empty");
-
-        try {
-            iter.next();
-        } catch (final Exception e) {
-            assertEquals(e.getClass(), new NoSuchElementException().getClass(), "NoSuchElementException must be thrown");
-        }
+        assertThrows(NoSuchElementException.class, iter::next);
     }
 
     @Test
     @Override
     public void testRemove() {
         final Iterator<String> iter = makeObject();
-
-        assertThrows(IllegalStateException.class, () -> iter.remove(),
-                "Calling remove before the first call to next() should throw an exception");
-
+        assertThrows(IllegalStateException.class, () -> iter.remove(), "Calling remove before the first call to next() should throw an exception");
         for (final String testValue : testArray) {
             final String iterValue = iter.next();
-
             assertEquals(testValue, iterValue, "Iteration value is correct");
-
             if (!iterValue.equals("Four")) {
                 iter.remove();
             }
         }
-
         assertTrue(list1.isEmpty(), "List is empty");
         assertEquals(1, list2.size(), "List is empty");
         assertTrue(list3.isEmpty(), "List is empty");

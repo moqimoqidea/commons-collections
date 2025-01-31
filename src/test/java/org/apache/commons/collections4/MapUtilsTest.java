@@ -19,12 +19,12 @@ package org.apache.commons.collections4;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -50,6 +50,7 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.collections4.map.LazyMap;
 import org.apache.commons.collections4.map.MultiValueMap;
 import org.apache.commons.collections4.map.PredicatedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -127,19 +128,12 @@ public class MapUtilsTest {
         final Map<Integer, String> inner = new HashMap<>(2, 1);
         inner.put(2, "B");
         inner.put(3, "C");
-
         final Map<Integer, Object> outer = new HashMap<>(2, 1);
         outer.put(0, inner);
         outer.put(1, "A");
-
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         final PrintStream outPrint = new PrintStream(out);
-
-        try {
-            MapUtils.debugPrint(outPrint, "Print Map", outer);
-        } catch (final ClassCastException e) {
-            fail("No Casting should be occurring!");
-        }
+        MapUtils.debugPrint(outPrint, "Print Map", outer);
     }
 
     @Test
@@ -246,7 +240,7 @@ public class MapUtilsTest {
         final String INDENT = "    ";
 
         final Map<Object, Object> map = new HashMap<>();
-        final Map<Object, Object> map2= new HashMap<>();
+        final Map<Object, Object> map2 = new HashMap<>();
         map.put(null, map2);
         map2.put("2", "B");
 
@@ -607,7 +601,7 @@ public class MapUtilsTest {
             if ("noKey".equals(key)) {
                 return "default";
             }
-            return "";
+            return StringUtils.EMPTY;
         }));
         assertEquals("default", MapUtils.getString(null, "noKey", "default"));
     }
@@ -736,7 +730,7 @@ public class MapUtilsTest {
     public void testLazyMapFactory() {
         final Factory<Integer> factory = FactoryUtils.constantFactory(Integer.valueOf(5));
         Map<Object, Object> map = MapUtils.lazyMap(new HashMap<>(), factory);
-        assertTrue(map instanceof LazyMap);
+        assertInstanceOf(LazyMap.class, map);
         assertAll(
                 () -> assertThrows(NullPointerException.class, () -> MapUtils.lazyMap(new HashMap<>(), (Factory<Object>) null),
                         "Expecting NullPointerException for null factory"),
@@ -746,7 +740,7 @@ public class MapUtilsTest {
 
         final Transformer<Object, Integer> transformer = TransformerUtils.asTransformer(factory);
         map = MapUtils.lazyMap(new HashMap<>(), transformer);
-        assertTrue(map instanceof LazyMap);
+        assertInstanceOf(LazyMap.class, map);
         assertAll(
                 () -> assertThrows(NullPointerException.class, () -> MapUtils.lazyMap(new HashMap<>(), (Transformer<Object, Object>) null),
                         "Expecting NullPointerException for null transformer"),
@@ -810,7 +804,7 @@ public class MapUtilsTest {
         inMap.put("key1", "value1");
         inMap.put("key2", "value2");
         final Map<String, String> map = MapUtils.orderedMap(inMap);
-        assertTrue(map instanceof OrderedMap);
+        assertInstanceOf(OrderedMap.class, map);
     }
 
     @Test
@@ -875,7 +869,7 @@ public class MapUtilsTest {
     public void testPredicatedMap() {
         final Predicate<Object> p = getPredicate();
         final Map<Object, Object> map = MapUtils.predicatedMap(new HashMap<>(), p, p);
-        assertTrue(map instanceof PredicatedMap);
+        assertInstanceOf(PredicatedMap.class, map);
 
         assertThrows(NullPointerException.class, () -> MapUtils.predicatedMap(null, p, p),
                 "Expecting NullPointerException for null map.");
@@ -990,7 +984,7 @@ public class MapUtilsTest {
         MapUtils.safeAddToMap(inMap, "key1", "value1");
         MapUtils.safeAddToMap(inMap, "key2", null);
         assertEquals("value1", inMap.get("key1"));
-        assertEquals("", inMap.get("key2"));
+        assertEquals(StringUtils.EMPTY, inMap.get("key2"));
     }
 
     @Test

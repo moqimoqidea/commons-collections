@@ -17,6 +17,7 @@
 package org.apache.commons.collections4.bag;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -24,9 +25,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.apache.commons.collections4.Bag;
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.collection.AbstractCollectionTest;
+import org.apache.commons.collections4.functors.NonePredicate;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,13 +40,6 @@ import org.junit.jupiter.api.Test;
  * is extensively used and tested in AbstractBagTest.
  */
 public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
-
-    /**
-     * JUnit constructor.
-     */
-    public CollectionBagTest() {
-        super(CollectionBagTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {
@@ -79,6 +76,20 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
     @Override
     public Bag<T> makeObject() {
         return CollectionBag.collectionBag(new HashBag<>());
+    }
+
+    @Test
+    public void testAdd_Predicate_ComparatorCustom() throws Throwable {
+        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>(Comparator.comparing(Predicate::toString));
+        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
+        collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24);
+    }
+
+    @Test
+    public void testAdd_Predicate_ComparatorDefault() throws Throwable {
+        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>();
+        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
+        assertThrows(ClassCastException.class, () -> collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24));
     }
 
 //    public void testCreate() throws Exception {

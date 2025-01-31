@@ -32,7 +32,6 @@ import org.apache.commons.collections4.set.UnmodifiableSet;
  * and/or {@link Get} but not {@link Map}.
  *
  * @since 4.0
- *
  * @see Get
  * @see Put
  */
@@ -70,7 +69,7 @@ public class SplitMapUtils {
             if (arg0 == this) {
                 return true;
             }
-            return arg0 instanceof WrappedGet && ((WrappedGet<?, ?>) arg0).get.equals(this.get);
+            return arg0 instanceof WrappedGet && ((WrappedGet<?, ?>) arg0).get.equals(get);
         }
 
         @Override
@@ -162,7 +161,7 @@ public class SplitMapUtils {
             if (obj == this) {
                 return true;
             }
-            return obj instanceof WrappedPut && ((WrappedPut<?, ?>) obj).put.equals(this.put);
+            return obj instanceof WrappedPut && ((WrappedPut<?, ?>) obj).put.equals(put);
         }
 
         @Override
@@ -217,6 +216,7 @@ public class SplitMapUtils {
      * If {@code get} implements {@link IterableMap} directly, no conversion will take place.
      * If {@code get} implements {@link Map} but not {@link IterableMap} it will be decorated.
      * Otherwise, an {@link Unmodifiable} {@link IterableMap} will be returned.
+     *
      * @param <K> the key type
      * @param <V> the value type
      * @param get to wrap, must not be null
@@ -259,6 +259,8 @@ public class SplitMapUtils {
     /**
      * Don't allow instances.
      */
-    private SplitMapUtils() {}
+    private SplitMapUtils() {
+        // empty
+    }
 
 }

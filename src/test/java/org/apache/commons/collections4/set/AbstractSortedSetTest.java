@@ -25,7 +25,7 @@ import java.util.TreeSet;
 import org.apache.commons.collections4.BulkTest;
 
 /**
- * Abstract test class for {@link SortedSet} methods and contracts.
+ * Tests {@link SortedSet}.
  * <p>
  * To use, subclass and override the {@link #makeObject()}
  * method.  You may have to override other protected methods if your
@@ -49,7 +49,6 @@ public abstract class AbstractSortedSetTest<E> extends AbstractSetTest<E> {
         private final E[] otherElements;
         @SuppressWarnings("unchecked")
         public TestSortedSetSubSet(final int bound, final boolean head) {
-            super("TestSortedSetSubSet");
             if (head) {
                 //System.out.println("HEADSET");
                 this.type = TYPE_HEADSET;
@@ -83,7 +82,6 @@ public abstract class AbstractSortedSetTest<E> extends AbstractSetTest<E> {
         } //type
         @SuppressWarnings("unchecked")
         public TestSortedSetSubSet(final int loBound, final int hiBound) {
-            super("TestSortedSetSubSet");
             //System.out.println("SUBSET");
             this.type = TYPE_SUBSET;
             this.lowBound = loBound;
@@ -127,13 +125,13 @@ public abstract class AbstractSortedSetTest<E> extends AbstractSetTest<E> {
         private SortedSet<E> getSubSet(final SortedSet<E> set) {
             final E[] elements = AbstractSortedSetTest.this.getFullElements();
             switch (type) {
-            case TYPE_SUBSET :
+            case TYPE_SUBSET:
                 return set.subSet(elements[lowBound], elements[highBound]);
-            case TYPE_HEADSET :
+            case TYPE_HEADSET:
                 return set.headSet(elements[highBound]);
-            case TYPE_TAILSET :
+            case TYPE_TAILSET:
                 return set.tailSet(elements[lowBound]);
-            default :
+            default:
                 return null;
             }
         }
@@ -169,15 +167,6 @@ public abstract class AbstractSortedSetTest<E> extends AbstractSetTest<E> {
             return getSubSet(AbstractSortedSetTest.this.makeObject());
         }
 
-    }
-
-    /**
-     * JUnit constructor.
-     *
-     * @param name  name for test
-     */
-    public AbstractSortedSetTest(final String name) {
-        super(name);
     }
 
     /**

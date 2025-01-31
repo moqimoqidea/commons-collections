@@ -62,50 +62,54 @@ public class CollectionUtils {
      */
     private static class CardinalityHelper<O> {
 
+        static boolean equals(final Collection<?> a, final Collection<?> b) {
+            return new HashBag<>(a).equals(new HashBag<>(b));
+        }
+
         /** Contains the cardinality for each object in collection A. */
-        final Map<O, Integer> cardinalityA;
+        final Bag<O> cardinalityA;
 
         /** Contains the cardinality for each object in collection B. */
-        final Map<O, Integer> cardinalityB;
+        final Bag<O> cardinalityB;
 
         /**
-         * Create a new CardinalityHelper for two collections.
+         * Creates a new CardinalityHelper for two collections.
+         *
          * @param a  the first collection
          * @param b  the second collection
          */
         CardinalityHelper(final Iterable<? extends O> a, final Iterable<? extends O> b) {
-            cardinalityA = CollectionUtils.<O>getCardinalityMap(a);
-            cardinalityB = CollectionUtils.<O>getCardinalityMap(b);
+            cardinalityA = new HashBag<>(a);
+            cardinalityB = new HashBag<>(b);
         }
 
         /**
-         * Returns the frequency of this object in collection A.
-         * @param obj  the object
+         * Gets the frequency of this object in collection A.
+         *
+         * @param key the key whose associated frequency is to be returned.
          * @return the frequency of the object in collection A
          */
-        public int freqA(final Object obj) {
-            return getFreq(obj, cardinalityA);
+        public int freqA(final Object key) {
+            return getFreq(key, cardinalityA);
         }
 
         /**
-         * Returns the frequency of this object in collection B.
-         * @param obj  the object
+         * Gets the frequency of this object in collection B.
+         *
+         * @param key the key whose associated frequency is to be returned.
          * @return the frequency of the object in collection B
          */
-        public int freqB(final Object obj) {
-            return getFreq(obj, cardinalityB);
+        public int freqB(final Object key) {
+            return getFreq(key, cardinalityB);
         }
 
-        private int getFreq(final Object obj, final Map<?, Integer> freqMap) {
-            final Integer count = freqMap.get(obj);
-            if (count != null) {
-                return count.intValue();
-            }
-            return 0;
+        private int getFreq(final Object key, final Bag<?> freqMap) {
+            return freqMap.getCount(key);
         }
 
         /**
-         * Returns the maximum frequency of an object.
+         * Gets the maximum frequency of an object.
+         *
          * @param obj  the object
          * @return the maximum frequency of the object
          */
@@ -114,7 +118,8 @@ public class CollectionUtils {
         }
 
         /**
-         * Returns the minimum frequency of an object.
+         * Gets the minimum frequency of an object.
+         *
          * @param obj  the object
          * @return the minimum frequency of the object
          */
@@ -163,7 +168,7 @@ public class CollectionUtils {
     }
 
     /**
-     * Helper class for set-related operations, e.g. union, subtract, intersection.
+     * Helper class for set-related operations, for example union, subtract, intersection.
      * @param <O>  the element type
      */
     private static final class SetOperationCardinalityHelper<O> extends CardinalityHelper<O> implements Iterable<O> {
@@ -217,34 +222,35 @@ public class CollectionUtils {
     /**
      * The index value when an element is not found in a collection or array: {@code -1}.
      *
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static final int INDEX_NOT_FOUND = -1;
+
     /**
      * Default prefix used while converting an Iterator to its String representation.
      *
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static final String DEFAULT_TOSTRING_PREFIX = "[";
 
     /**
      * Default suffix used while converting an Iterator to its String representation.
      *
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static final String DEFAULT_TOSTRING_SUFFIX = "]";
 
     /**
      * A String for Colon  (":").
      *
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static final String COLON = ":";
 
     /**
      * A String for Comma (",").
      *
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static final String COMMA = ",";
 
@@ -350,7 +356,7 @@ public class CollectionUtils {
     }
 
     /**
-     * Returns the number of occurrences of <i>obj</i> in <i>coll</i>.
+     * Returns the number of occurrences of <em>obj</em> in <em>coll</em>.
      *
      * @param obj the object to find the cardinality of
      * @param collection the {@link Iterable} to search
@@ -456,11 +462,9 @@ public class CollectionUtils {
      */
     public static <O> List<O> collate(final Iterable<? extends O> iterableA, final Iterable<? extends O> iterableB,
                                       final Comparator<? super O> comparator, final boolean includeDuplicates) {
-
         Objects.requireNonNull(iterableA, "iterableA");
         Objects.requireNonNull(iterableB, "iterableB");
         Objects.requireNonNull(comparator, "comparator");
-
         // if both Iterables are a Collection, we can estimate the size
         final int totalSize = iterableA instanceof Collection<?> && iterableB instanceof Collection<?> ?
                 Math.max(1, ((Collection<?>) iterableA).size() + ((Collection<?>) iterableB).size()) : 10;
@@ -470,7 +474,6 @@ public class CollectionUtils {
             return IteratorUtils.toList(iterator, totalSize);
         }
         final ArrayList<O> mergedList = new ArrayList<>(totalSize);
-
         O lastItem = null;
         while (iterator.hasNext()) {
             final O item = iterator.next();
@@ -479,7 +482,6 @@ public class CollectionUtils {
             }
             lastItem = item;
         }
-
         mergedList.trimToSize();
         return mergedList;
     }
@@ -560,7 +562,7 @@ public class CollectionUtils {
         if (inputIterator != null && transformer != null) {
             while (inputIterator.hasNext()) {
                 final I item = inputIterator.next();
-                final O value = transformer.transform(item);
+                final O value = transformer.apply(item);
                 outputCollection.add(value);
             }
         }
@@ -591,7 +593,7 @@ public class CollectionUtils {
      * which is the same behavior as {@link Collection#containsAll(Collection)}.
      * <p>
      * In other words, this method returns {@code true} iff the
-     * {@link #intersection} of <i>coll1</i> and <i>coll2</i> has the same cardinality as
+     * {@link #intersection} of <em>coll1</em> and <em>coll2</em> has the same cardinality as
      * the set of unique values from {@code coll2}. In case {@code coll2} is empty, {@code true}
      * will be returned.
      * </p>
@@ -642,7 +644,7 @@ public class CollectionUtils {
      * Returns {@code true} iff at least one element is in both collections.
      * <p>
      * In other words, this method returns {@code true} iff the
-     * {@link #intersection} of <i>coll1</i> and <i>coll2</i> is not empty.
+     * {@link #intersection} of <em>coll1</em> and <em>coll2</em> is not empty.
      * </p>
      *
      * @param coll1  the first collection, must not be null
@@ -675,7 +677,7 @@ public class CollectionUtils {
      * Returns {@code true} iff at least one element is in both collections.
      * <p>
      * In other words, this method returns {@code true} iff the
-     * {@link #intersection} of <i>coll1</i> and <i>coll2</i> is not empty.
+     * {@link #intersection} of <em>coll1</em> and <em>coll2</em> is not empty.
      * </p>
      *
      * @param <T> the type of object to lookup in {@code coll1}.
@@ -727,10 +729,10 @@ public class CollectionUtils {
      * Returns a {@link Collection} containing the exclusive disjunction
      * (symmetric difference) of the given {@link Iterable}s.
      * <p>
-     * The cardinality of each element <i>e</i> in the returned
+     * The cardinality of each element <em>e</em> in the returned
      * {@link Collection} will be equal to
-     * <code>max(cardinality(<i>e</i>,<i>a</i>),cardinality(<i>e</i>,<i>b</i>)) - min(cardinality(<i>e</i>,<i>a</i>),
-     * cardinality(<i>e</i>,<i>b</i>))</code>.
+     * <code>max(cardinality(<em>e</em>,<em>a</em>),cardinality(<em>e</em>,<em>b</em>)) - min(cardinality(<em>e</em>,<em>a</em>),
+     * cardinality(<em>e</em>,<em>b</em>))</code>.
      * </p>
      * <p>
      * This is equivalent to
@@ -778,7 +780,7 @@ public class CollectionUtils {
      * @return an empty collection if the argument is {@code null}
      */
     public static <T> Collection<T> emptyIfNull(final Collection<T> collection) {
-        return collection == null ? CollectionUtils.<T>emptyCollection() : collection;
+        return collection == null ? emptyCollection() : collection;
     }
 
     /**
@@ -833,7 +835,7 @@ public class CollectionUtils {
         boolean result = false;
         if (collection != null && predicate != null) {
             for (final Iterator<T> it = collection.iterator(); it.hasNext();) {
-                if (!predicate.evaluate(it.next())) {
+                if (!predicate.test(it.next())) {
                     it.remove();
                     result = true;
                 }
@@ -1128,7 +1130,7 @@ public class CollectionUtils {
      * @param equator  the equator used for generate hashCode
      * @return the hash code of the input collection using the hash method of an equator
      * @throws NullPointerException if the equator is {@code null}
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static <E> int hashCode(final Collection<? extends E> collection,
             final Equator<? super E> equator) {
@@ -1189,9 +1191,9 @@ public class CollectionUtils {
      * Returns {@code true} iff the given {@link Collection}s contain
      * exactly the same elements with exactly the same cardinalities.
      * <p>
-     * That is, iff the cardinality of <i>e</i> in <i>a</i> is
-     * equal to the cardinality of <i>e</i> in <i>b</i>,
-     * for each element <i>e</i> in <i>a</i> or <i>b</i>.
+     * That is, iff the cardinality of <em>e</em> in <em>a</em> is
+     * equal to the cardinality of <em>e</em> in <em>b</em>,
+     * for each element <em>e</em> in <em>a</em> or <em>b</em>.
      * </p>
      *
      * @param a  the first collection, must not be null
@@ -1200,35 +1202,21 @@ public class CollectionUtils {
      * @throws NullPointerException if either collection is null
      */
     public static boolean isEqualCollection(final Collection<?> a, final Collection<?> b) {
-        Objects.requireNonNull(a, "a");
-        Objects.requireNonNull(b, "b");
-        if (a.size() != b.size()) {
-            return false;
-        }
-        final CardinalityHelper<Object> helper = new CardinalityHelper<>(a, b);
-        if (helper.cardinalityA.size() != helper.cardinalityB.size()) {
-            return false;
-        }
-        for (final Object obj : helper.cardinalityA.keySet()) {
-            if (helper.freqA(obj) != helper.freqB(obj)) {
-                return false;
-            }
-        }
-        return true;
+        return CardinalityHelper.equals(a, b);
     }
 
     /**
      * Returns {@code true} iff the given {@link Collection}s contain
      * exactly the same elements with exactly the same cardinalities.
      * <p>
-     * That is, iff the cardinality of <i>e</i> in <i>a</i> is
-     * equal to the cardinality of <i>e</i> in <i>b</i>,
-     * for each element <i>e</i> in <i>a</i> or <i>b</i>.
+     * That is, iff the cardinality of <em>e</em> in <em>a</em> is
+     * equal to the cardinality of <em>e</em> in <em>b</em>,
+     * for each element <em>e</em> in <em>a</em> or <em>b</em>.
      * </p>
      * <p>
-     * <b>Note:</b> from version 4.1 onwards this method requires the input
+     * <strong>Note:</strong> from version 4.1 onwards this method requires the input
      * collections and equator to be of compatible type (using bounded wildcards).
-     * Providing incompatible arguments (e.g. by casting to their rawtypes)
+     * Providing incompatible arguments (for example by casting to their rawtypes)
      * will result in a {@code ClassCastException} thrown at runtime.
      * </p>
      *
@@ -1303,24 +1291,24 @@ public class CollectionUtils {
     }
 
     /**
-     * Returns {@code true} iff <i>a</i> is a <i>proper</i> sub-collection of <i>b</i>,
-     * that is, iff the cardinality of <i>e</i> in <i>a</i> is less
-     * than or equal to the cardinality of <i>e</i> in <i>b</i>,
-     * for each element <i>e</i> in <i>a</i>, and there is at least one
-     * element <i>f</i> such that the cardinality of <i>f</i> in <i>b</i>
-     * is strictly greater than the cardinality of <i>f</i> in <i>a</i>.
+     * Returns {@code true} iff <em>a</em> is a <em>proper</em> sub-collection of <em>b</em>,
+     * that is, iff the cardinality of <em>e</em> in <em>a</em> is less
+     * than or equal to the cardinality of <em>e</em> in <em>b</em>,
+     * for each element <em>e</em> in <em>a</em>, and there is at least one
+     * element <em>f</em> such that the cardinality of <em>f</em> in <em>b</em>
+     * is strictly greater than the cardinality of <em>f</em> in <em>a</em>.
      * <p>
      * The implementation assumes
      * </p>
      * <ul>
      *    <li>{@code a.size()} and {@code b.size()} represent the
-     *    total cardinality of <i>a</i> and <i>b</i>, resp. </li>
+     *    total cardinality of <em>a</em> and <em>b</em>, resp. </li>
      *    <li>{@code a.size() &lt; Integer.MAXVALUE}</li>
      * </ul>
      *
      * @param a  the first (sub?) collection, must not be null
      * @param b  the second (super?) collection, must not be null
-     * @return {@code true} iff <i>a</i> is a <i>proper</i> sub-collection of <i>b</i>
+     * @return {@code true} iff <em>a</em> is a <em>proper</em> sub-collection of <em>b</em>
      * @throws NullPointerException if either collection is null
      * @see #isSubCollection
      * @see Collection#containsAll
@@ -1328,18 +1316,18 @@ public class CollectionUtils {
     public static boolean isProperSubCollection(final Collection<?> a, final Collection<?> b) {
         Objects.requireNonNull(a, "a");
         Objects.requireNonNull(b, "b");
-        return a.size() < b.size() && CollectionUtils.isSubCollection(a, b);
+        return a.size() < b.size() && isSubCollection(a, b);
     }
 
     /**
-     * Returns {@code true} iff <i>a</i> is a sub-collection of <i>b</i>,
-     * that is, iff the cardinality of <i>e</i> in <i>a</i> is less than or
-     * equal to the cardinality of <i>e</i> in <i>b</i>, for each element <i>e</i>
-     * in <i>a</i>.
+     * Returns {@code true} iff <em>a</em> is a sub-collection of <em>b</em>,
+     * that is, iff the cardinality of <em>e</em> in <em>a</em> is less than or
+     * equal to the cardinality of <em>e</em> in <em>b</em>, for each element <em>e</em>
+     * in <em>a</em>.
      *
      * @param a the first (sub?) collection, must not be null
      * @param b the second (super?) collection, must not be null
-     * @return {@code true} iff <i>a</i> is a sub-collection of <i>b</i>
+     * @return {@code true} iff <em>a</em> is a sub-collection of <em>b</em>
      * @throws NullPointerException if either collection is null
      * @see #isProperSubCollection
      * @see Collection#containsAll
@@ -1416,7 +1404,7 @@ public class CollectionUtils {
      * <p>
      * NOTE: the number of permutations of a given collection is equal to n!, where
      * n is the size of the collection. Thus, the resulting collection will become
-     * <b>very</b> large for collections &gt; 10 (e.g. 10! = 3628800, 15! = 1307674368000).
+     * <strong>very</strong> large for collections &gt; 10 (for example 10! = 3628800, 15! = 1307674368000).
      * </p>
      * <p>
      * For larger collections it is advised to use a {@link PermutationIterator} to
@@ -1424,7 +1412,6 @@ public class CollectionUtils {
      * </p>
      *
      * @see PermutationIterator
-     *
      * @param <E>  the element type
      * @param collection  the collection to create permutations for, must not be null
      * @return an unordered collection of all permutations of the input collection
@@ -1475,7 +1462,7 @@ public class CollectionUtils {
      * This implementation iterates over {@code collection}, checking each element in
      * turn to see if it's contained in {@code remove}. If it's not contained, it's added
      * to the returned list. As a consequence, it is advised to use a collection type for
-     * {@code remove} that provides a fast (e.g. O(1)) implementation of
+     * {@code remove} that provides a fast (for example O(1)) implementation of
      * {@link Collection#contains(Object)}.
      * </p>
      *
@@ -1548,7 +1535,7 @@ public class CollectionUtils {
      * @param count  the specified number to remove, can't be less than 1
      * @return collection of elements that removed from the input collection
      * @throws NullPointerException if input is null
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static <E> Collection<E> removeCount(final Collection<E> input, int startIndex, int count) {
         Objects.requireNonNull(input, "input");
@@ -1589,7 +1576,7 @@ public class CollectionUtils {
      * @param endIndex  the end index (exclusive) to remove, must not be less than startIndex
      * @return collection of elements that removed from the input collection
      * @throws NullPointerException if input is null
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static <E> Collection<E> removeRange(final Collection<E> input, final int startIndex, final int endIndex) {
         Objects.requireNonNull(input, "input");
@@ -1599,7 +1586,7 @@ public class CollectionUtils {
         if (input.size() < endIndex) {
             throw new IndexOutOfBoundsException("The end index can't be greater than the size of collection.");
         }
-        return CollectionUtils.removeCount(input, startIndex, endIndex - startIndex);
+        return removeCount(input, startIndex, endIndex - startIndex);
     }
 
     /**
@@ -1613,7 +1600,7 @@ public class CollectionUtils {
      * This implementation iterates over {@code collection}, checking each element in
      * turn to see if it's contained in {@code retain}. If it's contained, it's added
      * to the returned list. As a consequence, it is advised to use a collection type for
-     * {@code retain} that provides a fast (e.g. O(1)) implementation of
+     * {@code retain} that provides a fast (for example O(1)) implementation of
      * {@link Collection#contains(Object)}.
      * </p>
      *
@@ -1740,7 +1727,7 @@ public class CollectionUtils {
 
         if (inputCollection != null && predicate != null) {
             for (final O item : inputCollection) {
-                if (predicate.evaluate(item)) {
+                if (predicate.test(item)) {
                     outputCollection.add(item);
                 }
             }
@@ -1783,7 +1770,7 @@ public class CollectionUtils {
 
         if (inputCollection != null && predicate != null) {
             for (final O element : inputCollection) {
-                if (predicate.evaluate(element)) {
+                if (predicate.test(element)) {
                     outputCollection.add(element);
                 } else {
                     rejectedCollection.add(element);
@@ -1804,7 +1791,7 @@ public class CollectionUtils {
      * @param <O>  the type of object the {@link Iterable} contains
      * @param inputCollection  the collection to get the input from, may not be null
      * @param predicate  the predicate to use, may be null
-     * @return the elements <b>not</b> matching the predicate (new list)
+     * @return the elements <strong>not</strong> matching the predicate (new list)
      */
     public static <O> Collection<O> selectRejected(final Iterable<? extends O> inputCollection,
                                                    final Predicate<? super O> predicate) {
@@ -1837,7 +1824,7 @@ public class CollectionUtils {
 
         if (inputCollection != null && predicate != null) {
             for (final O item : inputCollection) {
-                if (!predicate.evaluate(item)) {
+                if (!predicate.test(item)) {
                     outputCollection.add(item);
                 }
             }
@@ -1946,10 +1933,10 @@ public class CollectionUtils {
     }
 
     /**
-     * Returns a new {@link Collection} containing {@code <i>a</i> - <i>b</i>}.
-     * The cardinality of each element <i>e</i> in the returned {@link Collection}
-     * will be the cardinality of <i>e</i> in <i>a</i> minus the cardinality
-     * of <i>e</i> in <i>b</i>, or zero, whichever is greater.
+     * Returns a new {@link Collection} containing {@code <em>a</em> - <em>b</em>}.
+     * The cardinality of each element <em>e</em> in the returned {@link Collection}
+     * will be the cardinality of <em>e</em> in <em>a</em> minus the cardinality
+     * of <em>e</em> in <em>b</em>, or zero, whichever is greater.
      *
      * @param a  the collection to subtract from, must not be null
      * @param b  the collection to subtract, must not be null
@@ -1964,23 +1951,23 @@ public class CollectionUtils {
     }
 
     /**
-     * Returns a new {@link Collection} containing <i>a</i> minus a subset of
-     * <i>b</i>.  Only the elements of <i>b</i> that satisfy the predicate
-     * condition, <i>p</i> are subtracted from <i>a</i>.
+     * Returns a new {@link Collection} containing <em>a</em> minus a subset of
+     * <em>b</em>.  Only the elements of <em>b</em> that satisfy the predicate
+     * condition, <em>p</em> are subtracted from <em>a</em>.
      *
      * <p>
-     * The cardinality of each element <i>e</i> in the returned {@link Collection}
-     * that satisfies the predicate condition will be the cardinality of <i>e</i> in <i>a</i>
-     * minus the cardinality of <i>e</i> in <i>b</i>, or zero, whichever is greater.
+     * The cardinality of each element <em>e</em> in the returned {@link Collection}
+     * that satisfies the predicate condition will be the cardinality of <em>e</em> in <em>a</em>
+     * minus the cardinality of <em>e</em> in <em>b</em>, or zero, whichever is greater.
      * </p>
      * <p>
-     * The cardinality of each element <i>e</i> in the returned {@link Collection} that does <b>not</b>
-     * satisfy the predicate condition will be equal to the cardinality of <i>e</i> in <i>a</i>.
+     * The cardinality of each element <em>e</em> in the returned {@link Collection} that does <strong>not</strong>
+     * satisfy the predicate condition will be equal to the cardinality of <em>e</em> in <em>a</em>.
      * </p>
      *
      * @param a  the collection to subtract from, must not be null
      * @param b  the collection to subtract, must not be null
-     * @param p  the condition used to determine which elements of <i>b</i> are
+     * @param p  the condition used to determine which elements of <em>b</em> are
      *        subtracted.
      * @param <O> the generic type that is able to represent the types contained
      *        in both input collections.
@@ -1998,7 +1985,7 @@ public class CollectionUtils {
         final ArrayList<O> list = new ArrayList<>();
         final HashBag<O> bag = new HashBag<>();
         for (final O element : b) {
-            if (p.evaluate(element)) {
+            if (p.test(element)) {
                 bag.add(element);
             }
         }
@@ -2068,7 +2055,7 @@ public class CollectionUtils {
             if (collection instanceof List<?>) {
                 final List<C> list = (List<C>) collection;
                 for (final ListIterator<C> it = list.listIterator(); it.hasNext();) {
-                    it.set(transformer.transform(it.next()));
+                    it.set(transformer.apply(it.next()));
                 }
             } else {
                 final Collection<C> resultCollection = collect(collection, transformer);
@@ -2151,5 +2138,7 @@ public class CollectionUtils {
     /**
      * Don't allow instances.
      */
-    private CollectionUtils() {}
+    private CollectionUtils() {
+        // empty
+    }
 }

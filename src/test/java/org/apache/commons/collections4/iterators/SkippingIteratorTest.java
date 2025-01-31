@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * A unit test to test the basic functions of {@link SkippingIterator}.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class SkippingIteratorTest<E> extends AbstractIteratorTest<E> {
 
@@ -42,10 +44,6 @@ public class SkippingIteratorTest<E> extends AbstractIteratorTest<E> {
     };
 
     private List<E> testList;
-
-    public SkippingIteratorTest() {
-        super(SkippingIteratorTest.class.getSimpleName());
-    }
 
     @Override
     public Iterator<E> makeEmptyIterator() {
@@ -63,8 +61,6 @@ public class SkippingIteratorTest<E> extends AbstractIteratorTest<E> {
         throws Exception {
         testList = Arrays.asList((E[]) testArray);
     }
-
-    // ---------------- Tests ---------------------
 
     /**
      * Test the case if a negative {@code offset} is passed to the

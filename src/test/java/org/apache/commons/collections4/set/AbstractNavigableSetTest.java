@@ -25,7 +25,7 @@ import java.util.TreeSet;
 import org.apache.commons.collections4.BulkTest;
 
 /**
- * Abstract test class for {@link NavigableSet} methods and contracts.
+ * Tests {@link NavigableSet}.
  * <p>
  * To use, subclass and override the {@link #makeObject()}
  * method.  You may have to override other protected methods if your
@@ -50,7 +50,6 @@ public abstract class AbstractNavigableSetTest<E> extends AbstractSortedSetTest<
         private final boolean inclusive;
         @SuppressWarnings("unchecked")
         public TestNavigableSetSubSet(final int bound, final boolean head, final boolean inclusive) {
-            super("TestNavigableSetSubSet");
             if (head) {
                 this.type = TYPE_HEADSET;
                 this.inclusive = inclusive;
@@ -78,7 +77,6 @@ public abstract class AbstractNavigableSetTest<E> extends AbstractSortedSetTest<
         } //type
         @SuppressWarnings("unchecked")
         public TestNavigableSetSubSet(final int loBound, final int hiBound, final boolean inclusive) {
-            super("TestNavigableSetSubSet");
             this.type = TYPE_SUBSET;
             this.lowBound = loBound;
             this.highBound = hiBound;
@@ -131,16 +129,17 @@ public abstract class AbstractNavigableSetTest<E> extends AbstractSortedSetTest<
         public E[] getOtherElements() {
             return otherElements;
         }
+
         private NavigableSet<E> getSubSet(final NavigableSet<E> set) {
             final E[] elements = AbstractNavigableSetTest.this.getFullElements();
             switch (type) {
-            case TYPE_SUBSET :
+            case TYPE_SUBSET:
                 return set.subSet(elements[lowBound], inclusive, elements[highBound], inclusive);
-            case TYPE_HEADSET :
+            case TYPE_HEADSET:
                 return set.headSet(elements[highBound], inclusive);
-            case TYPE_TAILSET :
+            case TYPE_TAILSET:
                 return set.tailSet(elements[lowBound], inclusive);
-            default :
+            default:
                 return null;
             }
         }
@@ -174,15 +173,6 @@ public abstract class AbstractNavigableSetTest<E> extends AbstractSortedSetTest<
             return getSubSet(AbstractNavigableSetTest.this.makeObject());
         }
 
-    }
-
-    /**
-     * JUnit constructor.
-     *
-     * @param name  name for test
-     */
-    public AbstractNavigableSetTest(final String name) {
-        super(name);
     }
 
     /**

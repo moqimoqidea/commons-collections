@@ -33,14 +33,12 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the ReverseListIterator.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class ReverseListIteratorTest<E> extends AbstractListIteratorTest<E> {
 
     protected String[] testArray = { "One", "Two", "Three", "Four" };
-
-    public ReverseListIteratorTest() {
-        super(ReverseListIteratorTest.class.getSimpleName());
-    }
 
     @Override
     public ListIterator<E> makeEmptyIterator() {

@@ -20,6 +20,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import org.apache.commons.collections4.OrderedIterator;
 import org.apache.commons.collections4.OrderedMap;
@@ -70,10 +71,18 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
 
     /**
      * EntrySet iterator.
+     *
+     * @param <K> the key type.
+     * @param <V> the value type.
      */
     protected static class EntrySetIterator<K, V> extends LinkIterator<K, V> implements
             OrderedIterator<Map.Entry<K, V>>, ResettableIterator<Map.Entry<K, V>> {
 
+        /**
+         * Constructs a new instance.
+         *
+         * @param parent The parent AbstractLinkedMap.
+         */
         protected EntrySetIterator(final AbstractLinkedMap<K, V> parent) {
             super(parent);
         }
@@ -91,10 +100,17 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
 
     /**
      * KeySet iterator.
+     *
+     * @param <K> the key type.
      */
     protected static class KeySetIterator<K> extends LinkIterator<K, Object> implements
             OrderedIterator<K>, ResettableIterator<K> {
 
+        /**
+         * Constructs a new instance.
+         *
+         * @param parent The parent AbstractLinkedMap.
+         */
         @SuppressWarnings("unchecked")
         protected KeySetIterator(final AbstractLinkedMap<K, ?> parent) {
             super((AbstractLinkedMap<K, Object>) parent);
@@ -118,6 +134,10 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
      * then you will not be able to access the protected fields.
      * The {@code entryXxx()} methods on {@code AbstractLinkedMap} exist
      * to provide the necessary access.
+     * </p>
+     *
+     * @param <K> the key type.
+     * @param <V> the value type.
      */
     protected static class LinkEntry<K, V> extends HashEntry<K, V> {
         /** The entry before this one in the order */
@@ -140,64 +160,103 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
 
     /**
      * Base Iterator that iterates in link order.
+     *
+     * @param <K> the key type.
+     * @param <V> the value type.
      */
     protected abstract static class LinkIterator<K, V> {
 
         /** The parent map */
         protected final AbstractLinkedMap<K, V> parent;
+
         /** The current (last returned) entry */
         protected LinkEntry<K, V> last;
+
         /** The next entry */
         protected LinkEntry<K, V> next;
+
         /** The modification count expected */
         protected int expectedModCount;
 
+        /**
+         * Constructs a new instance.
+         *
+         * @param parent The parent AbstractLinkedMap.
+         */
         protected LinkIterator(final AbstractLinkedMap<K, V> parent) {
-            this.parent = parent;
+            this.parent = Objects.requireNonNull(parent);
             this.next = parent.header.after;
             this.expectedModCount = parent.modCount;
         }
 
+        /**
+         * Gets the current entry.
+         *
+         * @return the current entry.
+         */
         protected LinkEntry<K, V> currentEntry() {
             return last;
         }
 
+        /**
+         * Tests whether there is another entry.
+         *
+         * @return whether there is another entry.
+         */
         public boolean hasNext() {
             return next != parent.header;
         }
 
+        /**
+         * Tests whether there is a previous entry.
+         *
+         * @return whether there is a previous entry.
+         */
         public boolean hasPrevious() {
             return next.before != parent.header;
         }
 
+        /**
+         * Gets the next entry.
+         *
+         * @return the next entry.
+         */
         protected LinkEntry<K, V> nextEntry() {
             if (parent.modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
             if (next == parent.header)  {
-                throw new NoSuchElementException(AbstractHashedMap.NO_NEXT_ENTRY);
+                throw new NoSuchElementException(NO_NEXT_ENTRY);
             }
             last = next;
             next = next.after;
             return last;
         }
 
+        /**
+         * Gets the previous entry.
+         *
+         * @return the previous entry.
+         */
         protected LinkEntry<K, V> previousEntry() {
             if (parent.modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
             final LinkEntry<K, V> previous = next.before;
             if (previous == parent.header)  {
-                throw new NoSuchElementException(AbstractHashedMap.NO_PREVIOUS_ENTRY);
+                throw new NoSuchElementException(NO_PREVIOUS_ENTRY);
             }
             next = previous;
             last = previous;
             return last;
         }
 
+        /**
+         * Removes the current entry.
+         */
         public void remove() {
             if (last == null) {
-                throw new IllegalStateException(AbstractHashedMap.REMOVE_INVALID);
+                throw new IllegalStateException(REMOVE_INVALID);
             }
             if (parent.modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
@@ -207,6 +266,9 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
             expectedModCount = parent.modCount;
         }
 
+        /**
+         * Resets the state to the end.
+         */
         public void reset() {
             last = null;
             next = parent.header.after;
@@ -223,10 +285,18 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
 
     /**
      * MapIterator implementation.
+     *
+     * @param <K> the key type.
+     * @param <V> the value type.
      */
     protected static class LinkMapIterator<K, V> extends LinkIterator<K, V> implements
             OrderedMapIterator<K, V>, ResettableIterator<K> {
 
+        /**
+         * Constructs a new instance.
+         *
+         * @param parent The parent AbstractLinkedMap.
+         */
         protected LinkMapIterator(final AbstractLinkedMap<K, V> parent) {
             super(parent);
         }
@@ -235,7 +305,7 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
         public K getKey() {
             final LinkEntry<K, V> current = currentEntry();
             if (current == null) {
-                throw new IllegalStateException(AbstractHashedMap.GETKEY_INVALID);
+                throw new IllegalStateException(GETKEY_INVALID);
             }
             return current.getKey();
         }
@@ -244,7 +314,7 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
         public V getValue() {
             final LinkEntry<K, V> current = currentEntry();
             if (current == null) {
-                throw new IllegalStateException(AbstractHashedMap.GETVALUE_INVALID);
+                throw new IllegalStateException(GETVALUE_INVALID);
             }
             return current.getValue();
         }
@@ -263,7 +333,7 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
         public V setValue(final V value) {
             final LinkEntry<K, V> current = currentEntry();
             if (current == null) {
-                throw new IllegalStateException(AbstractHashedMap.SETVALUE_INVALID);
+                throw new IllegalStateException(SETVALUE_INVALID);
             }
             return current.setValue(value);
         }
@@ -271,10 +341,17 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
 
     /**
      * Values iterator.
+     *
+     * @param <V> the value type.
      */
     protected static class ValuesIterator<V> extends LinkIterator<Object, V> implements
             OrderedIterator<V>, ResettableIterator<V> {
 
+        /**
+         * Constructs a new instance.
+         *
+         * @param parent The parent AbstractLinkedMap.
+         */
         @SuppressWarnings("unchecked")
         protected ValuesIterator(final AbstractLinkedMap<?, V> parent) {
             super((AbstractLinkedMap<Object, V>) parent);
@@ -349,6 +426,7 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
      * <p>
      * This implementation adds the entry to the data storage table and
      * to the end of the linked list.
+     * </p>
      *
      * @param entry  the entry to add
      * @param hashIndex  the index into the data array to store at
@@ -403,6 +481,7 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
      * Creates an entry to store the data.
      * <p>
      * This implementation creates a new LinkEntry instance.
+     * </p>
      *
      * @param next  the next entry in sequence
      * @param hashCode  the hash code to use
@@ -535,9 +614,10 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
     /**
      * Initialize this subclass during construction.
      * <p>
-     * NOTE: As from v3.2 this method calls
+     * Note: As from v3.2 this method calls
      * {@link #createEntry(HashEntry, int, Object, Object)} to create
      * the map entry object.
+     * </p>
      */
     @Override
     protected void init() {
@@ -598,6 +678,7 @@ public abstract class AbstractLinkedMap<K, V> extends AbstractHashedMap<K, V> im
      * <p>
      * This implementation removes the entry from the linked list chain, then
      * calls the superclass implementation.
+     * </p>
      *
      * @param entry  the entry to remove
      * @param hashIndex  the index into the data structure

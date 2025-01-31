@@ -20,25 +20,30 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.functors.TruePredicate;
 
 /**
- * Decorates another {@link Iterator} using a predicate to filter elements.
+ * Decorates an {@link Iterator} using an optional predicate to filter elements.
  * <p>
  * This iterator decorates the underlying iterator, only allowing through
  * those elements that match the specified {@link Predicate Predicate}.
+ * </p>
  *
  * @param <E> the type of elements returned by this iterator.
  * @since 1.0
  */
-public class FilterIterator<E> implements Iterator<E> {
+public class FilterIterator<E> implements IteratorOperations<E> {
 
-    /** The iterator being used */
+    /** The iterator to be filtered. */
     private Iterator<? extends E> iterator;
-    /** The predicate being used */
-    private Predicate<? super E> predicate;
-    /** The next object in the iteration */
+
+    /** The predicate to filter elements. */
+    private Predicate<? super E> predicate = TruePredicate.truePredicate();
+
+    /** The next object in the iteration. */
     private E nextObject;
-    /** Whether the next object has been calculated yet */
+
+    /** Whether the next object has been calculated yet. */
     private boolean nextObjectSet;
 
     /**
@@ -63,17 +68,17 @@ public class FilterIterator<E> implements Iterator<E> {
      * given iterator and predicate.
      *
      * @param iterator  the iterator to use
-     * @param predicate  the predicate to use
+     * @param predicate  the predicate to use, null accepts all values.
      */
     public FilterIterator(final Iterator<? extends E> iterator, final Predicate<? super E> predicate) {
         this.iterator = iterator;
-        this.predicate = predicate;
+        this.predicate = safePredicate(predicate);
     }
 
     /**
      * Gets the iterator this iterator is using.
      *
-     * @return the iterator
+     * @return the underlying iterator.
      */
     public Iterator<? extends E> getIterator() {
         return iterator;
@@ -82,7 +87,7 @@ public class FilterIterator<E> implements Iterator<E> {
     /**
      * Gets the predicate this iterator is using.
      *
-     * @return the predicate
+     * @return the filtering predicate.
      */
     public Predicate<? super E> getPredicate() {
         return predicate;
@@ -136,6 +141,10 @@ public class FilterIterator<E> implements Iterator<E> {
         iterator.remove();
     }
 
+    private Predicate<? super E> safePredicate(final Predicate<? super E> predicate) {
+        return predicate != null ? predicate : TruePredicate.truePredicate();
+    }
+
     /**
      * Sets the iterator for this iterator to use.
      * If iteration has started, this effectively resets the iterator.
@@ -155,7 +164,7 @@ public class FilterIterator<E> implements Iterator<E> {
     private boolean setNextObject() {
         while (iterator.hasNext()) {
             final E object = iterator.next();
-            if (predicate.evaluate(object)) {
+            if (predicate.test(object)) {
                 nextObject = object;
                 nextObjectSet = true;
                 return true;
@@ -165,12 +174,12 @@ public class FilterIterator<E> implements Iterator<E> {
     }
 
     /**
-     * Sets the predicate this the iterator to use.
+     * Sets the predicate this the iterator to use where null accepts all values.
      *
-     * @param predicate  the predicate to use
+     * @param predicate  the predicate to use, null accepts all values.
      */
     public void setPredicate(final Predicate<? super E> predicate) {
-        this.predicate = predicate;
+        this.predicate = safePredicate(predicate);
         nextObject = null;
         nextObjectSet = false;
     }

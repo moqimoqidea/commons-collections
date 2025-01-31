@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +34,11 @@ import org.junit.jupiter.api.Test;
 
 /**
  * JUnit tests.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
-public class PassiveExpiringMapTest<K, V> extends AbstractMapTest<K, V> {
+public class PassiveExpiringMapTest<K, V> extends AbstractMapTest<PassiveExpiringMap<K, V>, K, V> {
 
     private static final class TestExpirationPolicy
         implements ExpirationPolicy<Integer, String> {
@@ -56,10 +58,6 @@ public class PassiveExpiringMapTest<K, V> extends AbstractMapTest<K, V> {
 
             return 0;
         }
-    }
-
-    public PassiveExpiringMapTest() {
-        super(PassiveExpiringMapTest.class.getSimpleName());
     }
 
 //    public void testCreate() throws Exception {
@@ -92,7 +90,7 @@ public class PassiveExpiringMapTest<K, V> extends AbstractMapTest<K, V> {
     }
 
     @Override
-    public Map<K, V> makeObject() {
+    public PassiveExpiringMap<K, V> makeObject() {
         return new PassiveExpiringMap<>();
     }
 
@@ -188,13 +186,11 @@ public class PassiveExpiringMapTest<K, V> extends AbstractMapTest<K, V> {
     }
 
     @Test
-    public void testExpiration() {
+    public void testExpiration() throws InterruptedException {
         validateExpiration(new PassiveExpiringMap<>(500), 500);
         validateExpiration(new PassiveExpiringMap<>(1000), 1000);
-        validateExpiration(new PassiveExpiringMap<>(
-                new PassiveExpiringMap.ConstantTimeToLiveExpirationPolicy<>(500)), 500);
-        validateExpiration(new PassiveExpiringMap<>(
-                new PassiveExpiringMap.ConstantTimeToLiveExpirationPolicy<>(1, TimeUnit.SECONDS)), 1000);
+        validateExpiration(new PassiveExpiringMap<>(new PassiveExpiringMap.ConstantTimeToLiveExpirationPolicy<>(500)), 500);
+        validateExpiration(new PassiveExpiringMap<>(new PassiveExpiringMap.ConstantTimeToLiveExpirationPolicy<>(1, TimeUnit.SECONDS)), 1000);
     }
 
     @Test
@@ -258,17 +254,10 @@ public class PassiveExpiringMapTest<K, V> extends AbstractMapTest<K, V> {
         assertNull(m.get("a"));
     }
 
-    private void validateExpiration(final Map<String, String> map, final long timeout) {
+    private void validateExpiration(final Map<String, String> map, final long timeout) throws InterruptedException {
         map.put("a", "b");
-
         assertNotNull(map.get("a"));
-
-        try {
-            Thread.sleep(2 * timeout);
-        } catch (final InterruptedException e) {
-            fail();
-        }
-
+        Thread.sleep(2 * timeout);
         assertNull(map.get("a"));
     }
 

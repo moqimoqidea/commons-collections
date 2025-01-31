@@ -39,7 +39,6 @@ import org.apache.commons.collections4.set.UnmodifiableSet;
  *
  * @param <K> the type of key elements
  * @param <V> the type of value elements
- *
  * @since 4.1
  */
 public final class UnmodifiableMultiValuedMap<K, V>
@@ -52,6 +51,7 @@ public final class UnmodifiableMultiValuedMap<K, V>
      * Factory method to create an unmodifiable MultiValuedMap.
      * <p>
      * If the map passed in is already unmodifiable, it is returned.
+     * </p>
      *
      * @param <K> the type of key elements
      * @param <V> the type of value elements

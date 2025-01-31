@@ -29,24 +29,24 @@ import org.apache.commons.collections4.iterators.AbstractMapIteratorTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link IterableMap} methods and contracts.
+ * Tests {@link IterableMap}.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
-public abstract class AbstractIterableMapTest<K, V> extends AbstractMapTest<K, V> {
+public abstract class AbstractIterableMapTest<K, V> extends AbstractMapTest<IterableMap<K, V>, K, V> {
 
     public class InnerTestMapIterator extends AbstractMapIteratorTest<K, V> {
-        public InnerTestMapIterator() {
-            super("InnerTestMapIterator");
-        }
 
         @Override
         public V[] addSetValues() {
-            return AbstractIterableMapTest.this.getNewSampleValues();
+            return getNewSampleValues();
         }
 
         @Override
         public Map<K, V> getConfirmedMap() {
             // assumes makeFullMapIterator() called first
-            return AbstractIterableMapTest.this.getConfirmed();
+            return getConfirmed();
         }
 
         @Override
@@ -74,12 +74,12 @@ public abstract class AbstractIterableMapTest<K, V> extends AbstractMapTest<K, V
 
         @Override
         public boolean supportsRemove() {
-            return AbstractIterableMapTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
         public boolean supportsSetValue() {
-            return AbstractIterableMapTest.this.isSetValueSupported();
+            return isSetValueSupported();
         }
 
         @Override
@@ -87,15 +87,6 @@ public abstract class AbstractIterableMapTest<K, V> extends AbstractMapTest<K, V
             super.verify();
             AbstractIterableMapTest.this.verify();
         }
-    }
-
-    /**
-     * JUnit constructor.
-     *
-     * @param testName  the test name
-     */
-    public AbstractIterableMapTest(final String testName) {
-        super(testName);
     }
 
     public BulkTest bulkTestMapIterator() {

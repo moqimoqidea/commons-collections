@@ -23,23 +23,36 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 public class WrappedBloomFilterTest extends AbstractBloomFilterTest<WrappedBloomFilter> {
 
+    private static class Fixture extends WrappedBloomFilter {
+
+        Fixture(final BloomFilter wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public WrappedBloomFilter copy() {
+            return new Fixture(getWrapped().copy());
+        }
+
+    }
+
     @Override
-    protected WrappedBloomFilter createEmptyFilter(Shape shape) {
-        return new WrappedBloomFilter(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape)) {
-        };
+    protected WrappedBloomFilter createEmptyFilter(final Shape shape) {
+        return new Fixture(new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 34})
-    public void testCharacteristics(int characteristics) {
-        Shape shape = getTestShape();
-        BloomFilter inner = new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape) {
+    public void testCharacteristics(final int characteristics) {
+        final Shape shape = getTestShape();
+        final BloomFilter inner = new DefaultBloomFilterTest.SparseDefaultBloomFilter(shape) {
             @Override
             public int characteristics() {
                 return characteristics;
             }
         };
-        WrappedBloomFilter underTest = new WrappedBloomFilter(inner) {};
+        final WrappedBloomFilter underTest = new Fixture(inner);
         assertEquals(characteristics, underTest.characteristics());
     }
+
 }

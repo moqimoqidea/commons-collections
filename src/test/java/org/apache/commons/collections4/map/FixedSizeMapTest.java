@@ -24,12 +24,11 @@ import org.apache.commons.collections4.IterableMap;
 /**
  * Extension of {@link AbstractMapTest} for exercising the {@link FixedSizeMap}
  * implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class FixedSizeMapTest<K, V> extends AbstractIterableMapTest<K, V> {
-
-    public FixedSizeMapTest() {
-        super(FixedSizeMapTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {

@@ -59,6 +59,7 @@ import org.apache.commons.collections4.OrderedIterator;
  * does use slightly more memory.
  * </p>
  *
+ * @param <E> the type of the elements in the list.
  * @since 3.1
  */
 public class TreeList<E> extends AbstractList<E> {
@@ -276,21 +277,21 @@ public class TreeList<E> extends AbstractList<E> {
          */
         private AVLNode<E> balance() {
             switch (heightRightMinusLeft()) {
-            case 1 :
-            case 0 :
-            case -1 :
+            case 1:
+            case 0:
+            case -1:
                 return this;
-            case -2 :
+            case -2:
                 if (left.heightRightMinusLeft() > 0) {
                     setLeft(left.rotateLeft(), null);
                 }
                 return rotateRight();
-            case 2 :
+            case 2:
                 if (right.heightRightMinusLeft() < 0) {
                     setRight(right.rotateRight(), null);
                 }
                 return rotateLeft();
-            default :
+            default:
                 throw new IllegalStateException("tree inconsistent!");
             }
         }
@@ -743,9 +744,8 @@ public class TreeList<E> extends AbstractList<E> {
                 .append(value)
                 .append(CollectionUtils.COMMA)
                 .append(getRightSubTree() != null)
-                .append(", faedelung ")
                 .append(rightIsNext)
-                .append(" )")
+                .append(")")
                 .toString();
         }
     }
@@ -787,7 +787,7 @@ public class TreeList<E> extends AbstractList<E> {
          * @param parent  the parent list
          * @param fromIndex  the index to start at
          */
-        protected TreeListIterator(final TreeList<E> parent, final int fromIndex) throws IndexOutOfBoundsException {
+        protected TreeListIterator(final TreeList<E> parent, final int fromIndex) {
             this.parent = parent;
             this.expectedModCount = parent.modCount;
             this.next = parent.root == null ? null : parent.root.get(fromIndex);
@@ -952,7 +952,9 @@ public class TreeList<E> extends AbstractList<E> {
      *
      * @param c  the collection to be added to this list
      * @return {@code true} if this list changed as a result of the call
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException if the specified collection contains a
+     *         null element and this collection does not permit null elements,
+     *         or if the specified collection is null
      */
     @Override
     public boolean addAll(final Collection<? extends E> c) {

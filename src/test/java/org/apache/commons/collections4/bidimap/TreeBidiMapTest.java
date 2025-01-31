@@ -25,21 +25,9 @@ import org.apache.commons.collections4.BidiMap;
  */
 public class TreeBidiMapTest<K extends Comparable<K>, V extends Comparable<V>> extends AbstractOrderedBidiMapTest<K, V> {
 
-    public TreeBidiMapTest() {
-        super(TreeBidiMapTest.class.getSimpleName());
-    }
-
     @Override
     public String getCompatibilityVersion() {
         return "4";
-    }
-
-    /**
-     * Override to prevent infinite recursion of tests.
-     */
-    @Override
-    public String[] ignoredTests() {
-        return new String[] {"TreeBidiMapTest.bulkTestInverseMap.bulkTestInverseMap"};
     }
 
     @Override
@@ -48,7 +36,12 @@ public class TreeBidiMapTest<K extends Comparable<K>, V extends Comparable<V>> e
     }
 
     @Override
-    public boolean isAllowNullValue() {
+    public boolean isAllowNullValueGet() {
+        return false;
+    }
+
+    @Override
+    public boolean isAllowNullValuePut() {
         return false;
     }
 

@@ -26,6 +26,7 @@ import org.apache.commons.collections4.Predicate;
  * <p>
  * This iterator decorates the underlying iterator, only allowing through
  * those elements that match the specified {@link Predicate Predicate}.
+ * </p>
  *
  * @param <E> the type of elements returned by this iterator.
  * @since 2.0
@@ -81,7 +82,7 @@ public class FilterListIterator<E> implements ListIterator<E> {
      *
      * @param iterator  the iterator to use
      */
-    public FilterListIterator(final ListIterator<? extends E> iterator ) {
+    public FilterListIterator(final ListIterator<? extends E> iterator) {
         this.iterator = iterator;
     }
 
@@ -182,7 +183,7 @@ public class FilterListIterator<E> implements ListIterator<E> {
 
     @Override
     public int previousIndex() {
-        return nextIndex-1;
+        return nextIndex - 1;
     }
 
     /** Not supported. */
@@ -193,11 +194,11 @@ public class FilterListIterator<E> implements ListIterator<E> {
 
     /**
      * Not supported.
-     * @param o the element with which to replace the last element returned by
+     * @param ignored the element with which to replace the last element returned by
      *          {@code next} or {@code previous}
      */
     @Override
-    public void set(final E o) {
+    public void set(final E ignored) {
         throw new UnsupportedOperationException("FilterListIterator.set(Object) is not supported.");
     }
 
@@ -229,7 +230,7 @@ public class FilterListIterator<E> implements ListIterator<E> {
         }
         while (iterator.hasNext()) {
             final E object = iterator.next();
-            if (predicate.evaluate(object)) {
+            if (predicate.test(object)) {
                 nextObject = object;
                 nextObjectSet = true;
                 return true;
@@ -265,7 +266,7 @@ public class FilterListIterator<E> implements ListIterator<E> {
         }
         while (iterator.hasPrevious()) {
             final E object = iterator.previous();
-            if (predicate.evaluate(object)) {
+            if (predicate.test(object)) {
                 previousObject = object;
                 previousObjectSet = true;
                 return true;

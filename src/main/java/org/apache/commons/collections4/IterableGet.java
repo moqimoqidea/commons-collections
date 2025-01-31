@@ -21,7 +21,6 @@ package org.apache.commons.collections4;
  *
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
- *
  * @since 4.0
  * @see Put
  */
@@ -31,6 +30,7 @@ public interface IterableGet<K, V> extends Get<K, V> {
      * <p>
      * A map iterator is an efficient way of iterating over maps.
      * There is no need to access the entry set or use Map Entry objects.
+     * </p>
      * <pre>
      * IterableMap&lt;String,Integer&gt; map = new HashedMap&lt;String,Integer&gt;();
      * MapIterator&lt;String,Integer&gt; it = map.mapIterator();

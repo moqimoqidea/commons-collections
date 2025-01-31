@@ -36,13 +36,22 @@ public abstract class AbstractBitwiseTrie<K, V> extends AbstractMap<K, V>
 
     /**
      * A basic implementation of {@link Entry}.
+     *
+     * @param <K> the type of the keys in this entry.
+     * @param <V> the type of the values in this entry.
      */
     abstract static class BasicEntry<K, V> implements Map.Entry<K, V>, Serializable {
 
         private static final long serialVersionUID = -944364551314110330L;
 
+        /**
+         * The entry's key.
+         */
         protected K key;
 
+        /**
+         * The entry's value.
+         */
         protected V value;
 
         BasicEntry(final K key) {
@@ -89,6 +98,10 @@ public abstract class AbstractBitwiseTrie<K, V> extends AbstractMap<K, V>
 
         /**
          * Replaces the current key and value with the provided key &amp; value.
+         *
+         * @param key The new key.
+         * @param value The new value.
+         * @return The previous value.
          */
         public V setKeyValue(final K key, final V value) {
             this.key = key;

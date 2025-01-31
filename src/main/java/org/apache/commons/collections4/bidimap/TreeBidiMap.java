@@ -54,7 +54,7 @@ import org.apache.commons.collections4.keyvalue.UnmodifiableMapEntry;
  * </p>
  * <p>
  * While that goal could be accomplished by taking a pair of TreeMaps
- * and redirecting requests to the appropriate TreeMap (e.g.,
+ * and redirecting requests to the appropriate TreeMap (for example,
  * containsKey would be directed to the TreeMap that maps values to
  * keys, containsValue would be directed to the TreeMap that maps keys
  * to values), there are problems with that implementation.
@@ -80,7 +80,6 @@ import org.apache.commons.collections4.keyvalue.UnmodifiableMapEntry;
  *
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
- *
  * @since 3.0 (previously DoubleOrderedMap v2.0)
  */
 public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
@@ -232,7 +231,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
             final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) obj;
             final Object value = entry.getValue();
             final Node<K, V> node = lookupKey(entry.getKey());
-            return node != null && node.getValue().equals(value);
+            return node != null && Objects.equals(node.getValue(), value);
         }
 
         @Override
@@ -248,7 +247,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
             final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) obj;
             final Object value = entry.getValue();
             final Node<K, V> node = lookupKey(entry.getKey());
-            if (node != null && node.getValue().equals(value)) {
+            if (node != null && Objects.equals(node.getValue(), value)) {
                 doRedBlackDelete(node);
                 return true;
             }
@@ -425,7 +424,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
             final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) obj;
             final Object value = entry.getValue();
             final Node<K, V> node = lookupValue(entry.getKey());
-            return node != null && node.getKey().equals(value);
+            return node != null && Objects.equals(node.getKey(), value);
         }
 
         @Override
@@ -441,7 +440,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
             final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) obj;
             final Object value = entry.getValue();
             final Node<K, V> node = lookupValue(entry.getKey());
-            if (node != null && node.getKey().equals(value)) {
+            if (node != null && Objects.equals(node.getKey(), value)) {
                 doRedBlackDelete(node);
                 return true;
             }
@@ -515,7 +514,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
         }
 
         @Override
-        public K setValue(final K obj) {
+        public K setValue(final K value) {
             throw new UnsupportedOperationException();
         }
     }
@@ -606,7 +605,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
                 return false;
             }
             final Map.Entry<?, ?> e = (Map.Entry<?, ?>) obj;
-            return getKey().equals(e.getKey()) && getValue().equals(e.getValue());
+            return Objects.equals(getKey(), e.getKey()) && Objects.equals(getValue(), e.getValue());
         }
 
         private Object getData(final DataElement dataElement) {
@@ -860,7 +859,7 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
         }
 
         @Override
-        public V setValue(final V obj) {
+        public V setValue(final V value) {
             throw new UnsupportedOperationException();
         }
     }
@@ -871,7 +870,6 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
      * Checks a key for validity (non-null and implements Comparable)
      *
      * @param key the key to be checked
-     *
      * @throws NullPointerException if key is null
      * @throws ClassCastException if key is not Comparable
      */
@@ -885,7 +883,6 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
      *
      * @param key the key to be checked
      * @param value the value to be checked
-     *
      * @throws NullPointerException if key or value is null
      * @throws ClassCastException if key or value is not Comparable
      */
@@ -916,7 +913,6 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
      * Checks a value for validity (non-null and implements Comparable)
      *
      * @param value the value to be checked
-     *
      * @throws NullPointerException if value is null
      * @throws ClassCastException if value is not Comparable
      */
@@ -929,7 +925,6 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
      *
      * @param o1  the first object
      * @param o2  the second object
-     *
      * @return negative value if o1 &lt; o2; 0 if o1 == o2; positive
      *         value if o1 &gt; o2
      */
@@ -1653,7 +1648,6 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
      * Inserts a node by its value.
      *
      * @param newNode the node to be inserted
-     *
      * @throws IllegalArgumentException if the node already exists
      *                                     in the value mapping
      */
@@ -1962,20 +1956,20 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
     }
 
     /**
-     * Reads the content of the stream.
+     * Deserializes the content of the stream.
      *
      * @param stream the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     @SuppressWarnings("unchecked") // This will fail at runtime if the stream is incorrect
-    private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException{
+    private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
         rootNode = new Node[2];
         final int size = stream.readInt();
-        for (int i = 0; i < size; i++){
-            final K k =(K) stream.readObject();
-            final V v =(V) stream.readObject();
+        for (int i = 0; i < size; i++) {
+            final K k = (K) stream.readObject();
+            final V v = (V) stream.readObject();
             put(k, v);
         }
     }
@@ -2219,17 +2213,17 @@ public class TreeBidiMap<K extends Comparable<K>, V extends Comparable<V>>
     }
 
     /**
-     * Writes the content to the stream for serialization.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param stream  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
-    private void writeObject(final ObjectOutputStream stream) throws IOException{
-        stream.defaultWriteObject();
-        stream.writeInt(this.size());
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeInt(this.size());
         for (final Entry<K, V> entry : entrySet()) {
-            stream.writeObject(entry.getKey());
-            stream.writeObject(entry.getValue());
+            out.writeObject(entry.getKey());
+            out.writeObject(entry.getValue());
         }
     }
 

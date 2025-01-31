@@ -41,6 +41,8 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
 
     /**
      * Inner class AbstractEntry.
+     *
+     * @param <E> the element type.
      */
     protected abstract static class AbstractEntry<E> implements Entry<E> {
 
@@ -48,7 +50,7 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
         public boolean equals(final Object object) {
             if (object instanceof Entry) {
                 final Entry<?> other = (Entry<?>) object;
-                final E element = this.getElement();
+                final E element = getElement();
                 final Object otherElement = other.getElement();
 
                 return this.getCount() == other.getCount() &&
@@ -68,8 +70,11 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
             return String.format("%s:%d", getElement(), getCount());
         }
     }
+
     /**
      * Inner class EntrySet.
+     *
+     * @param <E> the element type.
      */
     protected static class EntrySet<E> extends AbstractSet<Entry<E>> {
 
@@ -180,6 +185,8 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
 
     /**
      * Inner class UniqueSet.
+     *
+     * @param <E> the element type.
      */
     protected static class UniqueSet<E> extends AbstractSet<E> {
 
@@ -233,7 +240,7 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
     private transient Set<Entry<E>> entrySet;
 
     /**
-     * Constructor needed for subclass serialisation.
+     * Constructor needed for subclass serialization.
      */
     protected AbstractMultiSet() {
     }
@@ -313,7 +320,7 @@ public abstract class AbstractMultiSet<E> extends AbstractCollection<E> implemen
      * Read the multiset in using a custom routine.
      * @param in the input stream
      * @throws IOException any of the usual I/O related exceptions
-     * @throws ClassNotFoundException if the stream contains an object which class can not be loaded
+     * @throws ClassNotFoundException if the stream contains an object which class cannot be loaded
      * @throws ClassCastException if the stream does not contain the correct objects
      */
     protected void doReadObject(final ObjectInputStream in)

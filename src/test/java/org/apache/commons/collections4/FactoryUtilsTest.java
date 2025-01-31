@@ -149,7 +149,7 @@ public class FactoryUtilsTest {
     public void testInstantiateFactorySimple() {
         final Factory<Mock3> factory = FactoryUtils.instantiateFactory(Mock3.class);
         assertNotNull(factory);
-        Mock3 created = factory.create();
+        Mock3 created = factory.get();
         assertEquals(0, created.getValue());
         created = factory.create();
         assertEquals(1, created.getValue());
@@ -219,7 +219,7 @@ public class FactoryUtilsTest {
      * serialization/deserialization process.
      */
     @Test
-    public void testSingletonPatternInSerialization() {
+    public void testSingletonPatternInSerialization() throws ClassNotFoundException, IOException {
         final Object[] singletons = {
             ExceptionFactory.INSTANCE,
         };

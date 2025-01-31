@@ -28,24 +28,14 @@ import org.junit.jupiter.api.Test;
 /**
  * Extension of {@link AbstractSortedMapTest} for exercising the
  * {@link UnmodifiableTrie} implementation.
+ *
+ * @param <V> the value type.
  */
 public class UnmodifiableTrieTest<V> extends AbstractSortedMapTest<String, V> {
-
-    public UnmodifiableTrieTest() {
-        super(UnmodifiableTrieTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {
         return "4";
-    }
-
-    /**
-     * Override to prevent infinite recursion of tests.
-     */
-    @Override
-    public String[] ignoredTests() {
-        return null;
     }
 
     @Override

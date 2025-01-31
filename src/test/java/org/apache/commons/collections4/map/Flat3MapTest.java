@@ -40,24 +40,24 @@ import org.apache.commons.collections4.iterators.AbstractMapIteratorTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * JUnit tests.
+ * Tests {@link Flat3Map}.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
     public class TestFlatMapIterator extends AbstractMapIteratorTest<K, V> {
-        public TestFlatMapIterator() {
-            super("TestFlatMapIterator");
-        }
 
         @Override
         public V[] addSetValues() {
-            return Flat3MapTest.this.getNewSampleValues();
+            return getNewSampleValues();
         }
 
         @Override
         public Map<K, V> getConfirmedMap() {
             // assumes makeFullMapIterator() called first
-            return Flat3MapTest.this.getConfirmed();
+            return getConfirmed();
         }
 
         @Override
@@ -80,12 +80,12 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
         @Override
         public boolean supportsRemove() {
-            return Flat3MapTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
         public boolean supportsSetValue() {
-            return Flat3MapTest.this.isSetValueSupported();
+            return isSetValueSupported();
         }
 
         @Override
@@ -94,6 +94,7 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
             Flat3MapTest.this.verify();
         }
     }
+
     private static final Integer ONE = Integer.valueOf(1);
     private static final Integer TWO = Integer.valueOf(2);
     private static final Integer THREE = Integer.valueOf(3);
@@ -101,10 +102,6 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
     private static final String TWENTY = "20";
 
     private static final String THIRTY = "30";
-
-    public Flat3MapTest() {
-        super(Flat3MapTest.class.getSimpleName());
-    }
 
     @Override
     public BulkTest bulkTestMapIterator() {
@@ -209,17 +206,17 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
     @Test
     public void testCollections261() {
         final Flat3Map<Integer, Integer> m = new Flat3Map<>();
-        m.put( Integer.valueOf(1), Integer.valueOf(1) );
-        m.put( Integer.valueOf(0), Integer.valueOf(0) );
-        assertEquals( Integer.valueOf(1), m.remove( Integer.valueOf(1) ) );
-        assertEquals( Integer.valueOf(0), m.remove( Integer.valueOf(0) ) );
+        m.put(Integer.valueOf(1), Integer.valueOf(1));
+        m.put(Integer.valueOf(0), Integer.valueOf(0));
+        assertEquals(Integer.valueOf(1), m.remove(Integer.valueOf(1)));
+        assertEquals(Integer.valueOf(0), m.remove(Integer.valueOf(0)));
 
-        m.put( Integer.valueOf(2), Integer.valueOf(2) );
-        m.put( Integer.valueOf(1), Integer.valueOf(1) );
-        m.put( Integer.valueOf(0), Integer.valueOf(0) );
-        assertEquals( Integer.valueOf(2), m.remove( Integer.valueOf(2) ) );
-        assertEquals( Integer.valueOf(1), m.remove( Integer.valueOf(1) ) );
-        assertEquals( Integer.valueOf(0), m.remove( Integer.valueOf(0) ) );
+        m.put(Integer.valueOf(2), Integer.valueOf(2));
+        m.put(Integer.valueOf(1), Integer.valueOf(1));
+        m.put(Integer.valueOf(0), Integer.valueOf(0));
+        assertEquals(Integer.valueOf(2), m.remove(Integer.valueOf(2)));
+        assertEquals(Integer.valueOf(1), m.remove(Integer.valueOf(1)));
+        assertEquals(Integer.valueOf(0), m.remove(Integer.valueOf(0)));
     }
 
     @Test
@@ -782,7 +779,7 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
     }
 
     @Test
-    public void testSerialisation0() throws Exception {
+    public void testSerialization0() throws Exception {
         final Flat3Map<K, V> map = makeObject();
         final ByteArrayOutputStream bout = new ByteArrayOutputStream();
         final ObjectOutputStream out = new ObjectOutputStream(bout);
@@ -799,7 +796,7 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testSerialisation2() throws Exception {
+    public void testSerialization2() throws Exception {
         final Flat3Map<K, V> map = makeObject();
         map.put((K) ONE, (V) TEN);
         map.put((K) TWO, (V) TWENTY);
@@ -823,7 +820,7 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testSerialisation4() throws Exception {
+    public void testSerialization4() throws Exception {
         final Flat3Map<K, V> map = makeObject();
         map.put((K) ONE, (V) TEN);
         map.put((K) TWO, (V) TWENTY);
@@ -856,16 +853,16 @@ public class Flat3MapTest<K, V> extends AbstractIterableMapTest<K, V> {
         final Flat3Map<Integer, Integer> m = new Flat3Map<>();
         final String string0 = m.toString();
         assertNotNull(string0);
-        m.put( Integer.valueOf(1), Integer.valueOf(1) );
+        m.put(Integer.valueOf(1), Integer.valueOf(1));
         final String string1 = m.toString();
         assertNotNull(string1);
         assertNotSame(string0, string1);
-        m.put( Integer.valueOf(0), Integer.valueOf(0) );
+        m.put(Integer.valueOf(0), Integer.valueOf(0));
         final String string2 = m.toString();
         assertNotNull(string2);
         assertNotSame(string0, string2);
         assertNotSame(string1, string2);
-        m.put( Integer.valueOf(2), Integer.valueOf(2) );
+        m.put(Integer.valueOf(2), Integer.valueOf(2));
         final String string3 = m.toString();
         assertNotNull(string3);
         assertNotSame(string0, string3);

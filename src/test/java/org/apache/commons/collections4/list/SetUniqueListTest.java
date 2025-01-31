@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections4.set.UnmodifiableSet;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,10 +54,6 @@ public class SetUniqueListTest<E> extends AbstractListTest<E> {
 
     boolean extraVerify = true;
 
-    public SetUniqueListTest() {
-        super(SetUniqueListTest.class.getSimpleName());
-    }
-
     @Override
     public String getCompatibilityVersion() {
         return "4";
@@ -67,7 +64,7 @@ public class SetUniqueListTest<E> extends AbstractListTest<E> {
     public E[] getFullNonNullElements() {
         // override to avoid duplicate "One"
         return (E[]) new Object[] {
-            "",
+            StringUtils.EMPTY,
             "One",
             Integer.valueOf(2),
             "Three",

@@ -38,7 +38,7 @@ public class EnumerationUtils {
      * @param <T> the element type
      * @param enumeration the enumeration to use, may not be null
      * @return a new, single use {@link Iterable}
-     * @since 4.5
+     * @since 4.5.0-M1
      */
     public static <T> Iterable<T> asIterable(final Enumeration<T> enumeration) {
         return new IteratorIterable<>(new EnumerationIterator<>(enumeration));
@@ -50,6 +50,7 @@ public class EnumerationUtils {
      * <p>
      * The Enumeration is advanced to {@code index} (or to the end, if
      * {@code index} exceeds the number of entries) as a side effect of this method.
+     * </p>
      *
      * @param e  the enumeration to get a value from
      * @param index  the index to get

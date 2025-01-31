@@ -31,23 +31,22 @@ import java.util.TreeMap;
 import org.apache.commons.collections4.BulkTest;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.list.AbstractListTest;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Extension of {@link AbstractOrderedMapTest} for exercising the {@link ListOrderedMap}
- * implementation.
+ * Extension of {@link AbstractOrderedMapTest} for exercising the {@link ListOrderedMap} implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
     public class TestKeyListView extends AbstractListTest<K> {
 
-        TestKeyListView() {
-            super("TestKeyListView");
-        }
-
         @Override
         public K[] getFullElements() {
-            return ListOrderedMapTest.this.getSampleKeys();
+            return getSampleKeys();
         }
 
         @Override
@@ -57,7 +56,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public boolean isNullSupported() {
-            return ListOrderedMapTest.this.isAllowNullKey();
+            return isAllowNullKey();
         }
 
         @Override
@@ -89,13 +88,9 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
     public class TestValueListView extends AbstractListTest<V> {
 
-        TestValueListView() {
-            super("TestValueListView");
-        }
-
         @Override
         public V[] getFullElements() {
-            return ListOrderedMapTest.this.getSampleValues();
+            return getSampleValues();
         }
 
         @Override
@@ -105,7 +100,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public boolean isNullSupported() {
-            return ListOrderedMapTest.this.isAllowNullKey();
+            return isAllowNullKey();
         }
 
         @Override
@@ -133,10 +128,6 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
             return ListOrderedMapTest.this.makeObject().valueList();
         }
 
-    }
-
-    public ListOrderedMapTest() {
-        super(ListOrderedMapTest.class.getSimpleName());
     }
 
     public BulkTest bulkTestKeyListView() {
@@ -174,7 +165,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     }
 
     @Test
-    public void testCOLLECTIONS_474_nonNullValues () {
+    public void testCOLLECTIONS_474_nonNullValues() {
         final Object key1 = new Object();
         final Object key2 = new Object();
         final HashMap<Object, Object> hmap = new HashMap<>();
@@ -189,7 +180,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     }
 
     @Test
-    public void testCOLLECTIONS_474_nullValues () {
+    public void testCOLLECTIONS_474_nullValues() {
         final Object key1 = new Object();
         final Object key2 = new Object();
         final HashMap<Object, Object> hmap = new HashMap<>();
@@ -206,23 +197,12 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     @Test
     public void testGetByIndex() {
         resetEmpty();
-        ListOrderedMap<K, V> lom = getMap();
-        try {
-            lom.get(0);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.get(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().get(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().get(-1));
         resetFull();
-        lom = getMap();
-        try {
-            lom.get(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.get(lom.size());
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        final ListOrderedMap<K, V> lom = getMap();
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().get(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> lom.get(lom.size()));
         int i = 0;
         for (final MapIterator<K, V> it = lom.mapIterator(); it.hasNext(); i++) {
             assertSame(it.next(), lom.get(i));
@@ -232,23 +212,12 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     @Test
     public void testGetValueByIndex() {
         resetEmpty();
-        ListOrderedMap<K, V> lom = getMap();
-        try {
-            lom.getValue(0);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.getValue(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().getValue(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().getValue(-1));
         resetFull();
-        lom = getMap();
-        try {
-            lom.getValue(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.getValue(lom.size());
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        final ListOrderedMap<K, V> lom = getMap();
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().getValue(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> lom.getValue(lom.size()));
         int i = 0;
         for (final MapIterator<K, V> it = lom.mapIterator(); it.hasNext(); i++) {
             it.next();
@@ -261,7 +230,6 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
         resetEmpty();
         ListOrderedMap<K, V> lom = getMap();
         assertEquals(-1, lom.indexOf(getOtherKeys()));
-
         resetFull();
         lom = getMap();
         final List<K> list = new ArrayList<>();
@@ -284,8 +252,7 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
                 () -> assertThrows(IndexOutOfBoundsException.class, () -> finalLom.put(1, (K) "testInsert1", (V) "testInsert1v"),
                         "should not be able to insert at pos 1 in empty Map"),
                 () -> assertThrows(IndexOutOfBoundsException.class, () -> finalLom.put(-1, (K) "testInsert-1", (V) "testInsert-1v"),
-                        "should not be able to insert at pos -1 in empty Map")
-        );
+                        "should not be able to insert at pos -1 in empty Map"));
 
         // put where key doesn't exist
         lom.put(0, (K) "testInsert1", (V) "testInsert1v");
@@ -446,23 +413,12 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     @Test
     public void testRemoveByIndex() {
         resetEmpty();
-        ListOrderedMap<K, V> lom = getMap();
-        try {
-            lom.remove(0);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.remove(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().remove(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().remove(-1));
         resetFull();
-        lom = getMap();
-        try {
-            lom.remove(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.remove(lom.size());
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        final ListOrderedMap<K, V> lom = getMap();
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().remove(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> lom.remove(lom.size()));
         final List<K> list = new ArrayList<>();
         for (final MapIterator<K, V> it = lom.mapIterator(); it.hasNext();) {
             list.add(it.next());
@@ -480,23 +436,12 @@ public class ListOrderedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     @SuppressWarnings("unchecked")
     public void testSetValueByIndex() {
         resetEmpty();
-        ListOrderedMap<K, V> lom = getMap();
-        try {
-            lom.setValue(0, (V) "");
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.setValue(-1, (V) "");
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().setValue(0, (V) StringUtils.EMPTY));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().setValue(-1, (V) StringUtils.EMPTY));
         resetFull();
-        lom = getMap();
-        try {
-            lom.setValue(-1, (V) "");
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lom.setValue(lom.size(), (V) "");
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        final ListOrderedMap<K, V> lom = getMap();
+        assertThrows(IndexOutOfBoundsException.class, () -> lom.setValue(-1, (V) StringUtils.EMPTY));
+        assertThrows(IndexOutOfBoundsException.class, () -> lom.setValue(lom.size(), (V) StringUtils.EMPTY));
         for (int i = 0; i < lom.size(); i++) {
             final V value = lom.getValue(i);
             final Object input = Integer.valueOf(i);

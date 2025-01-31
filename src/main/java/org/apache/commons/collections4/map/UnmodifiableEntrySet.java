@@ -36,14 +36,13 @@ import org.apache.commons.collections4.set.AbstractSetDecorator;
  *
  * @param <K> the type of the keys in the map
  * @param <V> the type of the values in the map
- *
  * @since 3.0
  */
 public final class UnmodifiableEntrySet<K, V>
         extends AbstractSetDecorator<Map.Entry<K, V>> implements Unmodifiable {
 
     /**
-     * Implementation of a map entry that is unmodifiable.
+     * Implements a map entry that is unmodifiable.
      */
     private final class UnmodifiableEntry extends AbstractMapEntryDecorator<K, V> {
 
@@ -52,13 +51,13 @@ public final class UnmodifiableEntrySet<K, V>
         }
 
         @Override
-        public V setValue(final V obj) {
+        public V setValue(final V value) {
             throw new UnsupportedOperationException();
         }
     }
 
     /**
-     * Implementation of an entry set iterator.
+     * Implements an entry set iterator.
      */
     private final class UnmodifiableEntrySetIterator extends AbstractIteratorDecorator<Map.Entry<K, V>> {
 

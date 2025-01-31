@@ -29,7 +29,7 @@ import org.apache.commons.collections4.collection.AbstractCollectionTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link Set} methods and contracts.
+ * Tests {@link Set}.
  * <p>
  * Since {@link Set} doesn't stipulate much new behavior that isn't already
  * found in {@link Collection}, this class basically just adds tests for
@@ -43,15 +43,6 @@ import org.junit.jupiter.api.Test;
  * elements may be added; see {@link AbstractCollectionTest} for more details.
  */
 public abstract class AbstractSetTest<E> extends AbstractCollectionTest<E> {
-
-    /**
-     * JUnit constructor.
-     *
-     * @param name  name for test
-     */
-    public AbstractSetTest(final String name) {
-        super(name);
-    }
 
     /**
      * Gets the {@link AbstractCollectionTest#collection} fixture, but cast as a Set.

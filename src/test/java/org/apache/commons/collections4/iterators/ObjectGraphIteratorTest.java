@@ -136,10 +136,6 @@ public class ObjectGraphIteratorTest extends AbstractIteratorTest<Object> {
 
     protected List<Iterator<String>> iteratorList;
 
-    public ObjectGraphIteratorTest() {
-        super(ObjectGraphIteratorTest.class.getSimpleName());
-    }
-
     @Override
     public ObjectGraphIterator<Object> makeEmptyIterator() {
         final ArrayList<Object> list = new ArrayList<>();
@@ -148,6 +144,7 @@ public class ObjectGraphIteratorTest extends AbstractIteratorTest<Object> {
 
     @Override
     public ObjectGraphIterator<Object> makeObject() {
+        setUp();
         return new ObjectGraphIterator<>(iteratorList.iterator());
     }
 

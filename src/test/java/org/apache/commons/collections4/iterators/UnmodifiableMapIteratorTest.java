@@ -32,12 +32,11 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the UnmodifiableMapIterator.
+ *
+ * @param <K> the type of the keys in the maps tested.
+ * @param <V> the type of the values in the maps tested.
  */
 public class UnmodifiableMapIteratorTest<K, V> extends AbstractMapIteratorTest<K, V> {
-
-    public UnmodifiableMapIteratorTest() {
-        super(UnmodifiableMapIteratorTest.class.getSimpleName());
-    }
 
     @Override
     @SuppressWarnings("unchecked")

@@ -25,6 +25,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.collections4.Bag;
@@ -109,10 +110,12 @@ public abstract class AbstractMapBag<E> implements Bag<E> {
             canRemove = false;
         }
     }
+
     /**
      * Mutable integer class for storing the data.
      */
     protected static class MutableInteger {
+
         /** The value of this mutable. */
         protected int value;
 
@@ -137,8 +140,10 @@ public abstract class AbstractMapBag<E> implements Bag<E> {
             return value;
         }
     }
+
     /** The map to use to store the data */
     private transient Map<E, MutableInteger> map;
+
     /** The current total size of the bag */
     private int size;
 
@@ -149,7 +154,7 @@ public abstract class AbstractMapBag<E> implements Bag<E> {
     private transient Set<E> uniqueSet;
 
     /**
-     * Constructor needed for subclass serialisation.
+     * Constructor needed for subclass serialization.
      */
     protected AbstractMapBag() {
     }
@@ -161,7 +166,19 @@ public abstract class AbstractMapBag<E> implements Bag<E> {
      * @param map the map to assign
      */
     protected AbstractMapBag(final Map<E, MutableInteger> map) {
-        this.map = map;
+        this.map = Objects.requireNonNull(map, "map");
+    }
+
+    /**
+     * Constructs a new instance that assigns the specified Map as the backing store. The map
+     * must be empty and non-null. The bag is filled from the iterable elements.
+     *
+     * @param map the map to assign.
+     * @param iterable The bag is filled from these iterable elements.
+     */
+    protected AbstractMapBag(final Map<E, MutableInteger> map, final Iterable<? extends E> iterable) {
+        this(map);
+        iterable.forEach(this::add);
     }
 
     /**
@@ -270,7 +287,7 @@ public abstract class AbstractMapBag<E> implements Bag<E> {
      * @param map the map to use
      * @param in the input stream
      * @throws IOException any of the usual I/O related exceptions
-     * @throws ClassNotFoundException if the stream contains an object which class can not be loaded
+     * @throws ClassNotFoundException if the stream contains an object which class cannot be loaded
      * @throws ClassCastException if the stream does not contain the correct objects
      */
     protected void doReadObject(final Map<E, MutableInteger> map, final ObjectInputStream in)
@@ -461,7 +478,6 @@ public abstract class AbstractMapBag<E> implements Bag<E> {
      * Remove any members of the bag that are not in the given bag, respecting
      * cardinality.
      * @see #retainAll(Collection)
-     *
      * @param other the bag to retain
      * @return {@code true} if this call changed the collection
      */

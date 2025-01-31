@@ -18,6 +18,7 @@ package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,6 +30,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the UniqueFilterIterator class.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class UniqueFilterIteratorTest<E> extends AbstractIteratorTest<E> {
 
@@ -37,10 +40,6 @@ public class UniqueFilterIteratorTest<E> extends AbstractIteratorTest<E> {
     };
 
     protected List<E> list1;
-
-    public UniqueFilterIteratorTest() {
-        super(UniqueFilterIteratorTest.class.getSimpleName());
-    }
 
     @Override
     public UniqueFilterIterator<E> makeEmptyIterator() {
@@ -75,17 +74,10 @@ public class UniqueFilterIteratorTest<E> extends AbstractIteratorTest<E> {
         final Iterator<E> iter = makeObject();
         for (final String testValue : testArray) {
             final E iterValue = iter.next();
-
             assertEquals(testValue, iterValue, "Iteration value is correct");
         }
-
         assertFalse(iter.hasNext(), "Iterator should now be empty");
-
-        try {
-            iter.next();
-        } catch (final Exception e) {
-            assertEquals(e.getClass(), new NoSuchElementException().getClass(), "NoSuchElementException must be thrown");
-        }
+        assertThrows(NoSuchElementException.class, iter::next);
     }
 
 }

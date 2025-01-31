@@ -65,7 +65,6 @@ import org.apache.commons.collections4.functors.FactoryTransformer;
  *
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
- *
  * @since 3.2
  * @see LazyMap
  */
@@ -99,6 +98,7 @@ public class DefaultedMap<K, V> extends AbstractMapDecorator<K, V> implements Se
      * The transformer specified is called when a missing key is found.
      * The key is passed to the transformer as the input, and the result
      * will be returned as the result of the map get(key) method.
+     * </p>
      *
      * @param <K>  the key type
      * @param <V>  the value type
@@ -117,6 +117,7 @@ public class DefaultedMap<K, V> extends AbstractMapDecorator<K, V> implements Se
      * Factory method to create a defaulting map.
      * <p>
      * The value specified is returned when a missing key is found.
+     * </p>
      *
      * @param <K>  the key type
      * @param <V>  the value type
@@ -160,6 +161,7 @@ public class DefaultedMap<K, V> extends AbstractMapDecorator<K, V> implements Se
      * <p>
      * The object passed in will be returned by the map whenever an
      * unknown key is requested.
+     * </p>
      *
      * @param defaultValue  the default value to return when the key is not found
      */
@@ -173,15 +175,15 @@ public class DefaultedMap<K, V> extends AbstractMapDecorator<K, V> implements Se
         final V v;
         return (v = map.get(key)) != null || map.containsKey(key)
             ? v
-            : value.transform((K) key);
+            : value.apply((K) key);
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     @SuppressWarnings("unchecked")
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -190,10 +192,10 @@ public class DefaultedMap<K, V> extends AbstractMapDecorator<K, V> implements Se
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

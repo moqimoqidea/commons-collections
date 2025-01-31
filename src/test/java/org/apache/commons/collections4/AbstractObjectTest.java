@@ -35,7 +35,7 @@ import java.io.Serializable;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link Object} methods and contracts.
+ * Tests {@link Object}.
  * <p>
  * To use, simply extend this class, and implement
  * the {@link #makeObject()} method.
@@ -48,15 +48,6 @@ public abstract class AbstractObjectTest extends BulkTest {
 
     /** Current major release for Collections */
     public static final int COLLECTIONS_MAJOR_VERSION = 4;
-
-    /**
-     * JUnit constructor.
-     *
-     * @param testName  the test class name
-     */
-    public AbstractObjectTest(final String testName) {
-        super(testName);
-    }
 
     protected String getCanonicalEmptyCollectionName(final Object object) {
         final StringBuilder retval = new StringBuilder();
@@ -181,7 +172,7 @@ public abstract class AbstractObjectTest extends BulkTest {
     /**
      * Override this method if a subclass is testing an object
      * that cannot serialize an "empty" Collection.
-     * (e.g. Comparators have no contents)
+     * (for example Comparators have no contents)
      *
      * @return true
      */
@@ -192,7 +183,7 @@ public abstract class AbstractObjectTest extends BulkTest {
     /**
      * Override this method if a subclass is testing an object
      * that cannot serialize a "full" Collection.
-     * (e.g. Comparators have no contents)
+     * (for example Comparators have no contents)
      *
      * @return true
      */

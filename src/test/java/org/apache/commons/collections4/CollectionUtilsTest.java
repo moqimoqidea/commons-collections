@@ -16,11 +16,11 @@
  */
 package org.apache.commons.collections4;
 
-import static org.apache.commons.collections4.functors.EqualPredicate.equalPredicate;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,6 +53,9 @@ import org.apache.commons.collections4.collection.SynchronizedCollection;
 import org.apache.commons.collections4.collection.TransformedCollection;
 import org.apache.commons.collections4.collection.UnmodifiableCollection;
 import org.apache.commons.collections4.functors.DefaultEquator;
+import org.apache.commons.collections4.functors.EqualPredicate;
+import org.apache.commons.collections4.functors.InstanceofPredicate;
+import org.apache.commons.collections4.functors.UniquePredicate;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,7 +147,7 @@ public class CollectionUtilsTest extends MockTestCase {
 
         // Ensure that generic bounds accept valid parameters, but return
         // expected results
-        // e.g. no longs in the "int" Iterable<Number>, and vice versa.
+        // for example no longs in the "int" Iterable<Number>, and vice versa.
         assertEquals(0, CollectionUtils.cardinality(2L, iterableA2));
         assertEquals(0, CollectionUtils.cardinality(2, iterableB2));
 
@@ -247,10 +250,10 @@ public class CollectionUtilsTest extends MockTestCase {
     @Test
     @Deprecated
     public void find() {
-        Predicate<Number> testPredicate = equalPredicate((Number) 4);
+        Predicate<Number> testPredicate = EqualPredicate.equalPredicate((Number) 4);
         Integer test = CollectionUtils.find(collectionA, testPredicate);
         assertEquals(4, (int) test);
-        testPredicate = equalPredicate((Number) 45);
+        testPredicate = EqualPredicate.equalPredicate((Number) 45);
         test = CollectionUtils.find(collectionA, testPredicate);
         assertNull(test);
         assertNull(CollectionUtils.find(null, testPredicate));
@@ -280,12 +283,12 @@ public class CollectionUtilsTest extends MockTestCase {
 
         final Collection<String> strings = Arrays.asList("a", "b", "c");
         final StringBuilder result = new StringBuilder();
-        result.append(CollectionUtils.forAllButLastDo(strings, (Closure<String>) input -> result.append(input+";")));
+        result.append(CollectionUtils.forAllButLastDo(strings, (Closure<String>) input -> result.append(input + ";")));
         assertEquals("a;b;c", result.toString());
 
         final Collection<String> oneString = Arrays.asList("a");
         final StringBuilder resultOne = new StringBuilder();
-        resultOne.append(CollectionUtils.forAllButLastDo(oneString, (Closure<String>) input -> resultOne.append(input+";")));
+        resultOne.append(CollectionUtils.forAllButLastDo(oneString, (Closure<String>) input -> resultOne.append(input + ";")));
         assertEquals("a", resultOne.toString());
         assertNull(CollectionUtils.forAllButLastDo(strings, (Closure<String>) null)); // do not remove cast
         assertNull(CollectionUtils.forAllButLastDo((Collection<String>) null, (Closure<String>) null)); // do not remove cast
@@ -596,7 +599,7 @@ public class CollectionUtilsTest extends MockTestCase {
 
         final List<Integer> combinedList = new ArrayList<>(collectionD);
         combinedList.addAll(collectionE);
-        combinedList.sort(null);
+        Collections.sort(combinedList);
 
         assertEquals(combinedList, result2, "Merge two lists 2");
 
@@ -640,7 +643,7 @@ public class CollectionUtilsTest extends MockTestCase {
         final Set<Integer> combinedSet = new HashSet<>(collectionD);
         combinedSet.addAll(collectionE);
         final List<Integer> combinedList = new ArrayList<>(combinedSet);
-        combinedList.sort(null);
+        Collections.sort(combinedList);
 
         assertEquals(combinedList, result2, "Merge two lists 2 - ignore duplicates");
     }
@@ -1045,7 +1048,7 @@ public class CollectionUtilsTest extends MockTestCase {
     }
 
     /**
-     * Tests that {@link List}s are handled correctly - e.g. using
+     * Tests that {@link List}s are handled correctly - for example using
      * {@link List#get(int)}.
      */
     @Test
@@ -1612,7 +1615,7 @@ public class CollectionUtilsTest extends MockTestCase {
     public void testPredicatedCollection() {
         final Predicate<Object> predicate = PredicateUtils.instanceofPredicate(Integer.class);
         final Collection<Number> collection = CollectionUtils.predicatedCollection(new ArrayList<>(), predicate);
-        assertTrue(collection instanceof PredicatedCollection, "returned object should be a PredicatedCollection");
+        assertInstanceOf(PredicatedCollection.class, collection, "returned object should be a PredicatedCollection");
     }
 
     @Test
@@ -1942,6 +1945,15 @@ public class CollectionUtilsTest extends MockTestCase {
     }
 
     @Test
+    public void testSelect_Iterable_Predicate_Collection_JiraCollections864() {
+        final UniquePredicate<Object> uniquePredicate0 = new UniquePredicate<>();
+        final LinkedList<InstanceofPredicate> linkedList0 = new LinkedList<>();
+        final Class<InstanceofPredicate> class0 = InstanceofPredicate.class;
+        final InstanceofPredicate instanceofPredicate0 = new InstanceofPredicate(class0);
+        CollectionUtils.select((Iterable<? extends InstanceofPredicate>) linkedList0, (Predicate<? super InstanceofPredicate>) uniquePredicate0, linkedList0);
+    }
+
+    @Test
     public void testSelectRejected() {
         final List<Long> list = new ArrayList<>();
         list.add(1L);
@@ -2187,7 +2199,7 @@ public class CollectionUtilsTest extends MockTestCase {
     @Deprecated
     public void testSynchronizedCollection() {
         final Collection<Object> col = CollectionUtils.synchronizedCollection(new ArrayList<>());
-        assertTrue(col instanceof SynchronizedCollection, "Returned object should be a SynchronizedCollection.");
+        assertInstanceOf(SynchronizedCollection.class, col, "Returned object should be a SynchronizedCollection.");
 
         assertThrows(NullPointerException.class, () -> CollectionUtils.synchronizedCollection(null),
                 "Expecting NullPointerException for null collection.");
@@ -2232,7 +2244,7 @@ public class CollectionUtilsTest extends MockTestCase {
     public void testTransformedCollection() {
         final Transformer<Object, Object> transformer = TransformerUtils.nopTransformer();
         final Collection<Object> collection = CollectionUtils.transformingCollection(new ArrayList<>(), transformer);
-        assertTrue(collection instanceof TransformedCollection, "returned object should be a TransformedCollection");
+        assertInstanceOf(TransformedCollection.class, collection, "returned object should be a TransformedCollection");
     }
 
     @Test
@@ -2296,7 +2308,7 @@ public class CollectionUtilsTest extends MockTestCase {
     @Deprecated
     public void testUnmodifiableCollection() {
         final Collection<Object> col = CollectionUtils.unmodifiableCollection(new ArrayList<>());
-        assertTrue(col instanceof UnmodifiableCollection, "Returned object should be a UnmodifiableCollection.");
+        assertInstanceOf(UnmodifiableCollection.class, col, "Returned object should be a UnmodifiableCollection.");
 
         assertThrows(NullPointerException.class, () -> CollectionUtils.unmodifiableCollection(null),
                 "Expecting NullPointerException for null collection.");

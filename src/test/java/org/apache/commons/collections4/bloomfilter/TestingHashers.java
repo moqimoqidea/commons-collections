@@ -75,7 +75,7 @@ public class TestingHashers {
      * @return {@code filter} for chaining
      */
     public static <T extends BloomFilter> T populateRange(final T filter, final int start, final int end) {
-        filter.merge((IndexProducer) p -> {
+        filter.merge((IndexExtractor) p -> {
             for (int i = start; i <= end; i++) {
                 if (!p.test(i)) {
                     return false;
@@ -90,11 +90,14 @@ public class TestingHashers {
      * Creates an EnhancedDoubleHasher hasher from 2 random longs.
      */
     public static Hasher randomHasher() {
-        return new EnhancedDoubleHasher( ThreadLocalRandom.current().nextLong(), ThreadLocalRandom.current().nextLong() );
+        return new EnhancedDoubleHasher(ThreadLocalRandom.current().nextLong(), ThreadLocalRandom.current().nextLong());
     }
 
     /**
      * Do not instantiate.
      */
-    private TestingHashers() {}
+    private TestingHashers() {
+        // empty
+    }
+
 }

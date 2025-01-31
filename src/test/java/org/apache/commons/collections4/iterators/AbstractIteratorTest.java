@@ -16,16 +16,20 @@
  */
 package org.apache.commons.collections4.iterators;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.collections4.AbstractObjectTest;
+import org.apache.commons.collections4.IteratorUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,17 +39,11 @@ import org.junit.jupiter.api.Test;
  * Concrete subclasses must provide the iterator to be tested.
  * They must also specify certain details of how the iterator operates by
  * overriding the supportsXxx() methods if necessary.
+ * </p>
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public abstract class AbstractIteratorTest<E> extends AbstractObjectTest {
-
-    /**
-     * JUnit constructor.
-     *
-     * @param testName  the test class name
-     */
-    public AbstractIteratorTest(final String testName) {
-        super(testName);
-    }
 
     /**
      * Implement this method to return an iterator over an empty collection.
@@ -115,6 +113,18 @@ public abstract class AbstractIteratorTest<E> extends AbstractObjectTest {
     }
 
     /**
+     * Tests {@link Iterator#forEachRemaining(java.util.function.Consumer)}.
+     */
+    @Test
+    public void testForEachRemaining() {
+        final List<E> expected = IteratorUtils.toList(makeObject());
+        final Iterator<E> it = makeObject();
+        final List<E> actual = new ArrayList<>();
+        it.forEachRemaining(actual::add);
+        assertEquals(expected, actual);
+    }
+
+    /**
      * Test normal iteration behavior.
      */
     @Test
@@ -129,11 +139,7 @@ public abstract class AbstractIteratorTest<E> extends AbstractObjectTest {
         assertTrue(it.hasNext(), "hasNext() should return true for at least one element");
 
         // next() must not throw exception (ensure makeFullIterator is correct!)
-        try {
-            it.next();
-        } catch (final NoSuchElementException e) {
-            fail("Full iterators must have at least one element");
-        }
+        assertDoesNotThrow(it::next, "Full iterators must have at least one element");
 
         // iterate through
         while (it.hasNext()) {
@@ -157,9 +163,7 @@ public abstract class AbstractIteratorTest<E> extends AbstractObjectTest {
 
         if (!supportsRemove()) {
             // check for UnsupportedOperationException if not supported
-            try {
-                it.remove();
-            } catch (final UnsupportedOperationException ex) {}
+            assertThrows(UnsupportedOperationException.class, it::remove);
             return;
         }
 

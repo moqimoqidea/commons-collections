@@ -39,6 +39,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * JUnit tests.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class LRUMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
@@ -124,10 +127,6 @@ public class LRUMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
             return "SingleHashCode:" + code;
         }
 
-    }
-
-    public LRUMapTest() {
-        super(LRUMapTest.class.getSimpleName());
     }
 
     @Override

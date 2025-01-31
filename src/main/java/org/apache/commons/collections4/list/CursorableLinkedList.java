@@ -42,7 +42,7 @@ import java.util.ListIterator;
  * methods provides access to a {@code Cursor} instance which extends
  * {@code ListIterator}. The cursor allows changes to the list concurrent
  * with changes to the iterator. Note that the {@link #iterator()} method and
- * sublists do <b>not</b> provide this cursor behavior.
+ * sublists do <strong>not</strong> provide this cursor behavior.
  * </p>
  * <p>
  * The {@code Cursor} class is provided partly for backwards compatibility
@@ -52,12 +52,15 @@ import java.util.ListIterator;
  * the garbage collector to the rest.
  * </p>
  * <p>
- * <b>Note that this implementation is not synchronized.</b>
+ * <strong>Note that this implementation is not synchronized.</strong>
  * </p>
  *
+ * @param <E> the type of the elements in the list.
  * @see java.util.LinkedList
  * @since 1.0
+ * @deprecated parent {@link AbstractLinkedList} is source incompatible with List methods added in Java 21
  */
+@Deprecated
 public class CursorableLinkedList<E> extends AbstractLinkedList<E> implements Serializable {
 
     /**
@@ -119,7 +122,7 @@ public class CursorableLinkedList<E> extends AbstractLinkedList<E> implements Se
          * Mark this cursor as no longer being needed. Any resources
          * associated with this cursor are immediately released.
          * In previous versions of this class, it was mandatory to close
-         * all cursor objects to avoid memory leaks. It is <i>no longer</i>
+         * all cursor objects to avoid memory leaks. It is <em>no longer</em>
          * necessary to call this close method; an instance of this class
          * can now be treated exactly like a normal iterator.
          */
@@ -461,13 +464,13 @@ public class CursorableLinkedList<E> extends AbstractLinkedList<E> implements Se
     }
 
     /**
-     * Returns an iterator that does <b>not</b> support concurrent modification.
+     * Returns an iterator that does <strong>not</strong> support concurrent modification.
      * <p>
      * If the underlying list is modified while iterating using this iterator
      * a ConcurrentModificationException will occur.
      * The cursor behavior is available via {@link #listIterator()}.
      *
-     * @return a new iterator that does <b>not</b> support concurrent modification
+     * @return a new iterator that does <strong>not</strong> support concurrent modification
      */
     @Override
     public Iterator<E> iterator() {
@@ -520,7 +523,7 @@ public class CursorableLinkedList<E> extends AbstractLinkedList<E> implements Se
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -603,10 +606,10 @@ public class CursorableLinkedList<E> extends AbstractLinkedList<E> implements Se
     }
 
     /**
-     * Serializes the data held in this object to the stream specified.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

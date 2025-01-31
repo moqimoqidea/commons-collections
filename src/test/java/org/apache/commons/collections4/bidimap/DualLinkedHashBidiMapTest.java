@@ -18,24 +18,15 @@ package org.apache.commons.collections4.bidimap;
 
 /**
  * JUnit tests.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class DualLinkedHashBidiMapTest<K, V> extends AbstractBidiMapTest<K, V> {
-
-    public DualLinkedHashBidiMapTest() {
-        super(DualLinkedHashBidiMapTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {
         return "4";
-    }
-
-    /**
-     * Override to prevent infinite recursion of tests.
-     */
-    @Override
-    public String[] ignoredTests() {
-        return new String[] { "DualLinkedHashBidiMapTest.bulkTestInverseMap.bulkTestInverseMap" };
     }
 
     /**

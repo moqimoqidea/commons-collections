@@ -39,7 +39,10 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link BidiMap} methods and contracts.
+ * Tests {@link BidiMap}.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
@@ -69,10 +72,7 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
             TestBidiMapEntrySet.this.verify();
 
             if (!isSetValueSupported()) {
-                try {
-                    entry1.setValue(newValue1);
-                } catch (final UnsupportedOperationException ex) {
-                }
+                assertThrows(UnsupportedOperationException.class, () -> entry1.setValue(newValue1));
                 return;
             }
 
@@ -110,19 +110,15 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
 
     public class TestBidiMapIterator extends AbstractMapIteratorTest<K, V> {
 
-        public TestBidiMapIterator() {
-            super("TestBidiMapIterator");
-        }
-
         @Override
         public V[] addSetValues() {
-            return AbstractBidiMapTest.this.getNewSampleValues();
+            return getNewSampleValues();
         }
 
         @Override
         public Map<K, V> getConfirmedMap() {
             // assumes makeFullMapIterator() called first
-            return AbstractBidiMapTest.this.getConfirmed();
+            return getConfirmed();
         }
 
         @Override
@@ -145,12 +141,12 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
 
         @Override
         public boolean supportsRemove() {
-            return AbstractBidiMapTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
         public boolean supportsSetValue() {
-            return AbstractBidiMapTest.this.isSetValueSupported();
+            return isSetValueSupported();
         }
 
         @Override
@@ -200,6 +196,16 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
         }
 
         @Override
+        public boolean isAllowNullValueGet() {
+            return main.isAllowNullValueGet();
+        }
+
+        @Override
+        public boolean isAllowNullValuePut() {
+            return main.isAllowNullValuePut();
+        }
+
+        @Override
         public boolean isPutAddSupported() {
             return main.isPutAddSupported();
         }
@@ -228,14 +234,6 @@ public abstract class AbstractBidiMapTest<K, V> extends AbstractIterableMapTest<
         public BidiMap<V, K> makeObject() {
             return main.makeObject().inverseBidiMap();
         }
-    }
-
-    public AbstractBidiMapTest() {
-        super("Inverse");
-    }
-
-    public AbstractBidiMapTest(final String testName) {
-        super(testName);
     }
 
     public BulkTest bulkTestBidiMapIterator() {

@@ -28,12 +28,86 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test class for FixedOrderComparator.
  */
 public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
+
+    @Nested
+    class Equals {
+
+        @Test
+        void expectFalseWhenBothComparatorsWithDifferentItems() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(2, 3, 4);
+            assertFalse(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void expectFalseWhenBothComparatorsWithDifferentUnknownObjectBehavior() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>();
+            comparator1.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>();
+            comparator2.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+            assertFalse(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void expectFalseWhenFixedOrderComparatorIsComparedWithNull() {
+            final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
+            assertFalse(comparator.equals(null));
+        }
+
+        @Test
+        void expectFalseWhenFixedOrderComparatorIsComparedWithOtherObject() {
+            final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
+            assertFalse(comparator.equals(new Object()));
+        }
+
+        @Test
+        void expectFalseWhenOneComparatorIsLocked() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3);
+            comparator2.compare(1, 2);
+            assertFalse(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void expectFalseWhenOneComparatorsWithDuplicateItems() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3, 3);
+            assertFalse(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void expectTrueWhenBothComparatorsAreLocked() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3);
+            comparator1.compare(1, 2);
+            comparator2.compare(1, 2);
+            assertTrue(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void expectTrueWhenBothComparatorsWithoutAnyItems() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>();
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>();
+            assertTrue(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void expectTrueWhenBothObjectsAreSame() {
+            final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
+            assertTrue(comparator.equals(comparator));
+        }
+    }
+
+    //
+    // Initialization and busywork
+    //
 
     /**
      * Top cities of the world, by population including metro areas.
@@ -51,35 +125,22 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
         "Buenos Aires"
     };
 
-    //
-    // Initialization and busywork
-    //
-
-    public FixedOrderComparatorTest() {
-        super(FixedOrderComparatorTest.class.getSimpleName());
-    }
-
-    //
-    // Set up and tear down
-    //
-
     /** Shuffles the keys and asserts that the comparator sorts them back to
      * their original order.
      */
-    private void assertComparatorYieldsOrder(final String[] orderedObjects,
-                                             final Comparator<String> comparator) {
+    private void assertComparatorYieldsOrder(final String[] orderedObjects, final Comparator<String> comparator) {
         final String[] keys = orderedObjects.clone();
 
-        // shuffle until the order changes.  It's extremely rare that
+        // shuffle until the order changes. It's extremely rare that
         // this requires more than one shuffle.
 
         boolean isInNewOrder = false;
         final Random rand = new Random();
         while (keys.length > 1 && !isInNewOrder) {
             // shuffle:
-            for (int i = keys.length-1; i > 0; i--) {
+            for (int i = keys.length - 1; i > 0; i--) {
                 final String swap = keys[i];
-                final int j = rand.nextInt(i+1);
+                final int j = rand.nextInt(i + 1);
                 keys[i] = keys[j];
                 keys[j] = swap;
             }
@@ -93,7 +154,7 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
             }
         }
 
-        // The real test:  sort and make sure they come out right.
+        // The real test: sort and make sure they come out right.
 
         Arrays.sort(keys, comparator);
 
@@ -107,11 +168,6 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
         return Arrays.asList(topCities);
     }
 
-    @Override
-    public String getCompatibilityVersion() {
-        return "4";
-    }
-
 //    public void testCreate() throws Exception {
 //        writeExternalFormToDisk((java.io.Serializable) makeObject(), "src/test/resources/data/test/FixedOrderComparator.version4.obj");
 //    }
@@ -119,6 +175,11 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
     //
     // The tests
     //
+
+    @Override
+    public String getCompatibilityVersion() {
+        return "4";
+    }
 
     @Override
     public Comparator<String> makeObject() {
@@ -178,6 +239,10 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
         assertComparatorYieldsOrder(keys, comparator);
     }
 
+    //
+    // Helper methods
+    //
+
     /**
      * Tests whether or not updates are disabled after a comparison is made.
      */
@@ -194,10 +259,6 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
         assertThrows(UnsupportedOperationException.class, () -> comparator.addAsEqual("New York", "Minneapolis"),
                 "Should have thrown an UnsupportedOperationException");
     }
-
-    //
-    // Helper methods
-    //
 
     @Test
     public void testUnknownObjectBehavior() {
@@ -220,8 +281,8 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
         assertComparatorYieldsOrder(keys.toArray(ArrayUtils.EMPTY_STRING_ARRAY), comparator);
 
         assertEquals(-1, comparator.compare("Minneapolis", "New York"));
-        assertEquals( 1, comparator.compare("New York", "Minneapolis"));
-        assertEquals( 0, comparator.compare("Minneapolis", "St Paul"));
+        assertEquals(1, comparator.compare("New York", "Minneapolis"));
+        assertEquals(0, comparator.compare("Minneapolis", "St Paul"));
 
         comparator = new FixedOrderComparator<>(topCities);
         comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
@@ -229,9 +290,8 @@ public class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
         keys.add("Minneapolis");
         assertComparatorYieldsOrder(keys.toArray(ArrayUtils.EMPTY_STRING_ARRAY), comparator);
 
-        assertEquals( 1, comparator.compare("Minneapolis", "New York"));
+        assertEquals(1, comparator.compare("Minneapolis", "New York"));
         assertEquals(-1, comparator.compare("New York", "Minneapolis"));
-        assertEquals( 0, comparator.compare("Minneapolis", "St Paul"));
+        assertEquals(0, comparator.compare("Minneapolis", "St Paul"));
     }
-
 }

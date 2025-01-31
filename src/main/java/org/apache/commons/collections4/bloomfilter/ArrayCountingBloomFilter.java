@@ -25,29 +25,27 @@ import java.util.stream.IntStream;
 /**
  * A counting Bloom filter using an int array to track cells for each enabled bit.
  *
- * <p>Any operation that results in negative counts or integer overflow of
- * counts will mark this filter as invalid. This transition is not reversible.
- * The operation is completed in full, no exception is raised and the state is
- * set to invalid. This allows the cells for the filter immediately prior to the
- * operation that created the invalid state to be recovered. See the documentation
- * in {@link #isValid()} for details.</p>
+ * <p>
+ * Any operation that results in negative counts or integer overflow of counts will mark this filter as invalid. This transition is not reversible. The
+ * operation is completed in full, no exception is raised and the state is set to invalid. This allows the cells for the filter immediately prior to the
+ * operation that created the invalid state to be recovered. See the documentation in {@link #isValid()} for details.
+ * </p>
  *
- * <p>All the operations in the filter assume the cells are currently valid,
- * for example {@code cardinality} or {@code contains} operations. Behavior of an invalid
- * filter is undefined. It will no longer function identically to a standard
- * Bloom filter that is the merge of all the Bloom filters that have been added
- * to and not later subtracted from the counting Bloom filter.</p>
+ * <p>
+ * All the operations in the filter assume the cells are currently valid, for example {@code cardinality} or {@code contains} operations. Behavior of an invalid
+ * filter is undefined. It will no longer function identically to a standard Bloom filter that is the merge of all the Bloom filters that have been added to and
+ * not later subtracted from the counting Bloom filter.
+ * </p>
  *
- * <p>The maximum supported number of items that can be stored in the filter is
- * limited by the maximum array size combined with the {@link Shape}. For
- * example an implementation using a {@link Shape} with a false-positive
- * probability of 1e-6 and {@link Integer#MAX_VALUE} bits can reversibly store
- * approximately 75 million items using 20 hash functions per item with a memory
- * consumption of approximately 8 GB.
+ * <p>
+ * The maximum supported number of items that can be stored in the filter is limited by the maximum array size combined with the {@link Shape}. For example an
+ * implementation using a {@link Shape} with a false-positive probability of 1e-6 and {@link Integer#MAX_VALUE} bits can reversibly store approximately 75
+ * million items using 20 hash functions per item with a memory consumption of approximately 8 GB.
+ * </p>
  *
  * @see Shape
- * @see CellProducer
- * @since 4.5
+ * @see CellExtractor
+ * @since 4.5.0-M1
  */
 public final class ArrayCountingBloomFilter implements CountingBloomFilter {
 
@@ -105,9 +103,9 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public boolean add(final CellProducer other) {
+    public boolean add(final CellExtractor other) {
         Objects.requireNonNull(other, "other");
-        other.forEachCell(this::add);
+        other.processCells(this::add);
         return isValid();
     }
 
@@ -151,68 +149,23 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public boolean contains(final BitMapProducer bitMapProducer) {
-        return contains(IndexProducer.fromBitMapProducer(bitMapProducer));
+    public boolean contains(final BitMapExtractor bitMapExtractor) {
+        return contains(IndexExtractor.fromBitMapExtractor(bitMapExtractor));
     }
 
     @Override
-    public boolean contains(final IndexProducer indexProducer) {
-        return indexProducer.forEachIndex(idx -> this.cells[idx] != 0);
+    public boolean contains(final IndexExtractor indexExtractor) {
+        return indexExtractor.processIndices(idx -> cells[idx] != 0);
     }
 
+    /**
+     * Creates a new instance of this {@link ArrayCountingBloomFilter} with the same properties as the current one.
+     *
+     * @return a copy of this BloomFilter.
+     */
     @Override
     public ArrayCountingBloomFilter copy() {
         return new ArrayCountingBloomFilter(this);
-    }
-
-    @Override
-    public boolean forEachBitMap(final LongPredicate consumer) {
-        Objects.requireNonNull(consumer, "consumer");
-        final int blocksm1 = BitMap.numberOfBitMaps(cells.length) - 1;
-        int i = 0;
-        long value;
-        // must break final block separate as the number of bits may not fall on the long boundary
-        for (int j = 0; j < blocksm1; j++) {
-            value = 0;
-            for (int k = 0; k < Long.SIZE; k++) {
-                if (cells[i++] != 0) {
-                    value |= BitMap.getLongBit(k);
-                }
-            }
-            if (!consumer.test(value)) {
-                return false;
-            }
-        }
-        // Final block
-        value = 0;
-        for (int k = 0; i < cells.length; k++) {
-            if (cells[i++] != 0) {
-                value |= BitMap.getLongBit(k);
-            }
-        }
-        return consumer.test(value);
-    }
-
-    @Override
-    public boolean forEachCell(final CellProducer.CellConsumer consumer) {
-        Objects.requireNonNull(consumer, "consumer");
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] != 0 && !consumer.test(i, cells[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean forEachIndex(final IntPredicate consumer) {
-        Objects.requireNonNull(consumer, "consumer");
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] != 0 && !consumer.test(i)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
@@ -221,9 +174,9 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public int getMaxInsert(final CellProducer cellProducer) {
-        final int[] max = {Integer.MAX_VALUE};
-        cellProducer.forEachCell( (x, y) -> {
+    public int getMaxInsert(final CellExtractor cellExtractor) {
+        final int[] max = { Integer.MAX_VALUE };
+        cellExtractor.processCells((x, y) -> {
             final int count = cells[x] / y;
             if (count < max[0]) {
                 max[0] = count;
@@ -241,16 +194,19 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     /**
      * {@inheritDoc}
      *
-     * <p><em>Implementation note</em>
+     * <p>
+     * <em>Implementation note</em>
+     * </p>
      *
-     * <p>The state transition to invalid is permanent.</p>
+     * <p>
+     * The state transition to invalid is permanent.
+     * </p>
      *
-     * <p>This implementation does not correct negative cells to zero or integer
-     * overflow cells to {@link Integer#MAX_VALUE}. Thus the operation that
-     * generated invalid cells can be reversed by using the complement of the
-     * original operation with the same Bloom filter. This will restore the cells
-     * to the state prior to the invalid operation. Cells can then be extracted
-     * using {@link #forEachCell(CellConsumer)}.</p>
+     * <p>
+     * This implementation does not correct negative cells to zero or integer overflow cells to {@link Integer#MAX_VALUE}. Thus the operation that generated
+     * invalid cells can be reversed by using the complement of the original operation with the same Bloom filter. This will restore the cells to the state
+     * prior to the invalid operation. Cells can then be extracted using {@link #processCells(CellPredicate)}.
+     * </p>
      */
     @Override
     public boolean isValid() {
@@ -258,14 +214,64 @@ public final class ArrayCountingBloomFilter implements CountingBloomFilter {
     }
 
     @Override
-    public boolean subtract(final CellProducer other) {
+    public boolean processBitMaps(final LongPredicate consumer) {
+        Objects.requireNonNull(consumer, "consumer");
+        final int blocksm1 = BitMaps.numberOfBitMaps(cells.length) - 1;
+        int i = 0;
+        long value;
+        // must break final block separate as the number of bits may not fall on the long boundary
+        for (int j = 0; j < blocksm1; j++) {
+            value = 0;
+            for (int k = 0; k < Long.SIZE; k++) {
+                if (cells[i++] != 0) {
+                    value |= BitMaps.getLongBit(k);
+                }
+            }
+            if (!consumer.test(value)) {
+                return false;
+            }
+        }
+        // Final block
+        value = 0;
+        for (int k = 0; i < cells.length; k++) {
+            if (cells[i++] != 0) {
+                value |= BitMaps.getLongBit(k);
+            }
+        }
+        return consumer.test(value);
+    }
+
+    @Override
+    public boolean processCells(final CellPredicate consumer) {
+        Objects.requireNonNull(consumer, "consumer");
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] != 0 && !consumer.test(i, cells[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean processIndices(final IntPredicate consumer) {
+        Objects.requireNonNull(consumer, "consumer");
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] != 0 && !consumer.test(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean subtract(final CellExtractor other) {
         Objects.requireNonNull(other, "other");
-        other.forEachCell(this::subtract);
+        other.processCells(this::subtract);
         return isValid();
     }
 
     /**
-     * Subtract from the cell for the bit index.
+     * Subtracts from the cell for the bit index.
      *
      * @param idx the index
      * @param subtrahend the amount to subtract

@@ -45,7 +45,6 @@ import org.apache.commons.collections4.Transformer;
  *
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
- *
  * @see org.apache.commons.collections4.splitmap.TransformedSplitMap
  * @since 3.0
  */
@@ -63,6 +62,7 @@ public class TransformedMap<K, V>
      * If there are any elements already in the map being decorated, they
      * will be transformed by this method.
      * Contrast this with {@link #transformingMap(Map, Transformer, Transformer)}.
+     * </p>
      *
      * @param <K>  the key type
      * @param <V>  the value type
@@ -90,6 +90,7 @@ public class TransformedMap<K, V>
      * If there are any elements already in the map being decorated, they
      * are NOT transformed.
      * Contrast this with {@link #transformedMap(Map, Transformer, Transformer)}.
+     * </p>
      *
      * @param <K>  the key type
      * @param <V>  the value type
@@ -117,6 +118,7 @@ public class TransformedMap<K, V>
      * <p>
      * If there are any elements already in the collection being decorated, they
      * are NOT transformed.
+     * </p>
      *
      * @param map  the map to decorate, must not be null
      * @param keyTransformer  the transformer to use for key conversion, null means no conversion
@@ -139,7 +141,7 @@ public class TransformedMap<K, V>
      */
     @Override
     protected V checkSetValue(final V value) {
-        return valueTransformer.transform(value);
+        return valueTransformer.apply(value);
     }
 
     /**
@@ -167,11 +169,11 @@ public class TransformedMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      * @since 3.1
      */
     @SuppressWarnings("unchecked") // (1) should only fail if input stream is incorrect
@@ -192,13 +194,14 @@ public class TransformedMap<K, V>
         if (keyTransformer == null) {
             return object;
         }
-        return keyTransformer.transform(object);
+        return keyTransformer.apply(object);
     }
 
     /**
      * Transforms a map.
      * <p>
      * The transformer itself may throw an exception if necessary.
+     * </p>
      *
      * @param map  the map to transform
      * @return the transformed object
@@ -220,6 +223,7 @@ public class TransformedMap<K, V>
      * Transforms a value.
      * <p>
      * The transformer itself may throw an exception if necessary.
+     * </p>
      *
      * @param object  the object to transform
      * @return the transformed object
@@ -228,14 +232,14 @@ public class TransformedMap<K, V>
         if (valueTransformer == null) {
             return object;
         }
-        return valueTransformer.transform(object);
+        return valueTransformer.apply(object);
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 3.1
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

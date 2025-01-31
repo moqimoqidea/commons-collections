@@ -175,7 +175,7 @@ public class LinkedMap<K, V> extends AbstractLinkedMap<K, V> implements Serializ
         }
     }
 
-    /** Serialisation version */
+    /** Serialization version */
     private static final long serialVersionUID = 9077234323521161066L;
 
     /**
@@ -227,8 +227,10 @@ public class LinkedMap<K, V> extends AbstractLinkedMap<K, V> implements Serializ
      * the end of the list, which is an unexpected side effect of changing the
      * value of a list.  This occurs because changing the key, changes when the
      * mapping is added to the map and thus where it appears in the list.
+     * </p>
      * <p>
      * An alternative to this method is to use {@link #keySet()}.
+     * </p>
      *
      * @see #keySet()
      * @return The ordered list of keys.
@@ -287,11 +289,11 @@ public class LinkedMap<K, V> extends AbstractLinkedMap<K, V> implements Serializ
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -311,10 +313,10 @@ public class LinkedMap<K, V> extends AbstractLinkedMap<K, V> implements Serializ
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

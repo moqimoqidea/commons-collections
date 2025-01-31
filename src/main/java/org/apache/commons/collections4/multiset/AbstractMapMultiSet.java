@@ -36,19 +36,24 @@ import org.apache.commons.collections4.iterators.AbstractIteratorDecorator;
  * number of occurrences of that element in the multiset.
  * </p>
  *
- * @param <E> the type held in the multiset
+ * @param <E> the type held in the multiset.
  * @since 4.1
  */
 public abstract class AbstractMapMultiSet<E> extends AbstractMultiSet<E> {
 
     /**
      * Inner class EntrySetIterator.
+     *
+     * @param <E> the element type.
      */
     protected static class EntrySetIterator<E> implements Iterator<Entry<E>> {
 
         /** The parent map */
         protected final AbstractMapMultiSet<E> parent;
 
+        /**
+         * The source Iterator.
+         */
         protected final Iterator<Map.Entry<E, MutableInteger>> decorated;
 
         /** The last returned entry */
@@ -59,12 +64,12 @@ public abstract class AbstractMapMultiSet<E> extends AbstractMultiSet<E> {
 
         /**
          * Constructs a new instance.
-         * @param iterator  the iterator to decorate
+         * @param decorated  the iterator to decorate
          * @param parent  the parent multiset
          */
-        protected EntrySetIterator(final Iterator<Map.Entry<E, MutableInteger>> iterator,
+        protected EntrySetIterator(final Iterator<Map.Entry<E, MutableInteger>> decorated,
                                    final AbstractMapMultiSet<E> parent) {
-            this.decorated = iterator;
+            this.decorated = decorated;
             this.parent = parent;
         }
 
@@ -154,11 +159,17 @@ public abstract class AbstractMapMultiSet<E> extends AbstractMultiSet<E> {
             canRemove = false;
         }
     }
+
     /**
      * Inner class MultiSetEntry.
+     *
+     * @param <E> the key type.
      */
     protected static class MultiSetEntry<E> extends AbstractEntry<E> {
 
+        /**
+         * The parent entry.
+         */
         protected final Map.Entry<E, MutableInteger> parentEntry;
 
         /**
@@ -211,6 +222,8 @@ public abstract class AbstractMapMultiSet<E> extends AbstractMultiSet<E> {
 
     /**
      * Inner class UniqueSetIterator.
+     *
+     * @param <E> the element type.
      */
     protected static class UniqueSetIterator<E> extends AbstractIteratorDecorator<E> {
 
@@ -263,7 +276,7 @@ public abstract class AbstractMapMultiSet<E> extends AbstractMultiSet<E> {
     private transient int modCount;
 
     /**
-     * Constructor needed for subclass serialisation.
+     * Constructor needed for subclass serialization.
      */
     protected AbstractMapMultiSet() {
     }
@@ -335,7 +348,7 @@ public abstract class AbstractMapMultiSet<E> extends AbstractMultiSet<E> {
      * Read the multiset in using a custom routine.
      * @param in the input stream
      * @throws IOException any of the usual I/O related exceptions
-     * @throws ClassNotFoundException if the stream contains an object which class can not be loaded
+     * @throws ClassNotFoundException if the stream contains an object which class cannot be loaded
      * @throws ClassCastException if the stream does not contain the correct objects
      */
     @Override
@@ -471,7 +484,8 @@ public abstract class AbstractMapMultiSet<E> extends AbstractMultiSet<E> {
     /**
      * Sets the map being wrapped.
      * <p>
-     * <b>NOTE:</b> this method should only be used during deserialization
+     * <strong>Note:</strong> this method should only be used during deserialization
+     * </p>
      *
      * @param map the map to wrap
      */

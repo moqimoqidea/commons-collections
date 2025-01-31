@@ -20,7 +20,9 @@ import org.apache.commons.collections4.trie.KeyAnalyzer;
 
 /**
  * An {@link KeyAnalyzer} for {@link String}s.
- *
+ * <p>
+ * This class is stateless.
+ * </p>
  * @since 4.0
  */
 public class StringKeyAnalyzer extends KeyAnalyzer<String> {
@@ -39,6 +41,16 @@ public class StringKeyAnalyzer extends KeyAnalyzer<String> {
     /** Returns a bit mask where the given bit is set. */
     private static int mask(final int bit) {
         return MSB >>> bit;
+    }
+
+    /**
+     * Constructs a new instance.
+     *
+     * @deprecated Use {@link #INSTANCE}.
+     */
+    @Deprecated
+    public StringKeyAnalyzer() {
+        // empty
     }
 
     @Override
@@ -92,11 +104,11 @@ public class StringKeyAnalyzer extends KeyAnalyzer<String> {
 
         // All bits are 0
         if (allNull) {
-            return KeyAnalyzer.NULL_BIT_KEY;
+            return NULL_BIT_KEY;
         }
 
         // Both keys are equal
-        return KeyAnalyzer.EQUAL_BIT_KEY;
+        return EQUAL_BIT_KEY;
     }
 
     @Override

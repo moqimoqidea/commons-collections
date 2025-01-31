@@ -15,8 +15,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<document>
-
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 https://maven.apache.org/xsd/xdoc-2.0.xsd">
  <properties>
   <title>User guide</title>
   <author email="dev@commons.apache.org">Commons Documentation Team</author>
@@ -40,7 +41,7 @@ This document highlights some key features to get you started.
       </ul>
     </li>
     <li><a href='#Bags'>Bags</a></li>
-    <li><a href="bloomFilters.html">Bloom filters</a></li>
+    <li><a href="bloomFilters.html">Bloom filters (starting in 4.5.0)</a></li>
   </ul>
 <subsection name='Note On Synchronization'>
   <p>

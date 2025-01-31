@@ -21,12 +21,10 @@ import org.apache.commons.collections4.map.AbstractOrderedMapTest;
 
 /**
  * JUnit test of the OrderedMap interface of a PatriciaTrie.
+ *
+ * @param <V> the value type.
  */
 public class PatriciaTrie2Test<V> extends AbstractOrderedMapTest<String, V> {
-
-    public PatriciaTrie2Test() {
-        super(PatriciaTrie2Test.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {

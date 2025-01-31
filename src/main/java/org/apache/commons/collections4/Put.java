@@ -30,20 +30,24 @@ import java.util.Map;
  *
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
- *
  * @since 4.0
  * @see Get
  */
 public interface Put<K, V> {
 
     /**
+     * Removes all of the mappings from this map.
+     *
      * @see Map#clear()
      */
     void clear();
 
     /**
+     * Associates the specified value with the specified key in this map.
+     * <p>
      * Note that the return type is Object, rather than V as in the Map interface.
      * See the class Javadoc for further info.
+     * </p>
      *
      * @param key key with which the specified value is to be associated
      * @param value value to be associated with the specified key
@@ -57,6 +61,8 @@ public interface Put<K, V> {
     Object put(K key, V value);
 
     /**
+     * Copies all of the mappings from the specified map to this map.
+     *
      * @param t mappings to be stored in this map
      * @see Map#putAll(Map)
      */

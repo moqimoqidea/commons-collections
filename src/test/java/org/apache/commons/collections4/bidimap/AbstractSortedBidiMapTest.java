@@ -37,7 +37,7 @@ import org.apache.commons.collections4.map.AbstractSortedMapTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link SortedBidiMap} methods and contracts.
+ * Tests {@link SortedBidiMap}.
  */
 public abstract class AbstractSortedBidiMapTest<K extends Comparable<K>, V extends Comparable<V>> extends AbstractOrderedBidiMapTest<K, V> {
 
@@ -45,10 +45,9 @@ public abstract class AbstractSortedBidiMapTest<K extends Comparable<K>, V exten
     protected List<V> sortedValues = new ArrayList<>();
     protected SortedSet<V> sortedNewValues = new TreeSet<>();
 
-    public AbstractSortedBidiMapTest(final String testName) {
-        super(testName);
+    public AbstractSortedBidiMapTest() {
         sortedKeys = getAsList(getSampleKeys());
-        sortedKeys.sort(null);
+        Collections.sort(sortedKeys);
         sortedKeys = Collections.unmodifiableList(sortedKeys);
 
         final Map<K, V> map = new TreeMap<>();
@@ -77,15 +76,15 @@ public abstract class AbstractSortedBidiMapTest<K extends Comparable<K>, V exten
 //    }
 
     public BulkTest bulkTestHeadMap() {
-        return new AbstractSortedMapTest.TestHeadMap<>(this);
+        return new AbstractSortedMapTest.TestHeadMap<K, V>((AbstractBidiMapTest) this);
     }
 
     public BulkTest bulkTestSubMap() {
-        return new AbstractSortedMapTest.TestSubMap<>(this);
+        return new AbstractSortedMapTest.TestSubMap<>((AbstractBidiMapTest) this);
     }
 
     public BulkTest bulkTestTailMap() {
-        return new AbstractSortedMapTest.TestTailMap<>(this);
+        return new AbstractSortedMapTest.TestTailMap<>((AbstractBidiMapTest) this);
     }
 
     @Override
@@ -94,7 +93,12 @@ public abstract class AbstractSortedBidiMapTest<K extends Comparable<K>, V exten
     }
 
     @Override
-    public boolean isAllowNullValue() {
+    public boolean isAllowNullValueGet() {
+        return false;
+    }
+
+    @Override
+    public boolean isAllowNullValuePut() {
         return false;
     }
 

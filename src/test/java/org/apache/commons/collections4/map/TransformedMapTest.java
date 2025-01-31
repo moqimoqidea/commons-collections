@@ -34,12 +34,11 @@ import org.junit.jupiter.api.Test;
 /**
  * Extension of {@link AbstractMapTest} for exercising the {@link TransformedMap}
  * implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class TransformedMapTest<K, V> extends AbstractIterableMapTest<K, V> {
-
-    public TransformedMapTest() {
-        super(TransformedMapTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {

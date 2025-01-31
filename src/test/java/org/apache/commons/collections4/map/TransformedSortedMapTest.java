@@ -34,21 +34,15 @@ import org.junit.jupiter.api.Test;
 /**
  * Extension of {@link AbstractSortedMapTest} for exercising the {@link TransformedSortedMap}
  * implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class TransformedSortedMapTest<K, V> extends AbstractSortedMapTest<K, V> {
-
-    public TransformedSortedMapTest() {
-        super(TransformedSortedMapTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {
         return "4";
-    }
-
-    @Override
-    public String[] ignoredTests() {
-        return null;
     }
 
     @Override

@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,40 +43,10 @@ import org.junit.jupiter.api.Test;
 public class CursorableLinkedListTest<E> extends AbstractLinkedListTest<E> {
 
     private CursorableLinkedList<E> list;
-    public CursorableLinkedListTest() {
-        super(CursorableLinkedListTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {
         return "4";
-    }
-
-    /**
-     *  Ignore the serialization tests for sublists and sub-sublists.
-     *
-     *  @return an array of sublist serialization test names
-     */
-    @Override
-    public String[] ignoredTests() {
-        final ArrayList<String> list = new ArrayList<>();
-        final String prefix = "CursorableLinkedListTest";
-        final String bulk = ".bulkTestSubList";
-        final String[] ignored = {
-            ".testEmptyListSerialization",
-            ".testFullListSerialization",
-            ".testEmptyListCompatibility",
-            ".testFullListCompatibility",
-            ".testSimpleSerialization",
-            ".testCanonicalEmptyCollectionExists",
-            ".testCanonicalFullCollectionExists",
-            ".testSerializeDeserializeThenCompare"
-        };
-        for (final String element : ignored) {
-            list.add(prefix + bulk + element);
-            list.add(prefix + bulk + bulk + element);
-        }
-        return list.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
     }
 
     @Override
@@ -454,11 +423,7 @@ public class CursorableLinkedListTest<E> extends AbstractLinkedListTest<E> {
         assertEquals("3", it.next());
         it.remove();
         assertEquals("[4, 5]", list.toString());
-        try {
-            it.remove();
-        } catch (final IllegalStateException e) {
-            // expected
-        }
+        assertThrows(IllegalStateException.class, it::remove);
         assertEquals("4", it.next());
         assertEquals("5", it.next());
         it.remove();
@@ -1124,11 +1089,7 @@ public class CursorableLinkedListTest<E> extends AbstractLinkedListTest<E> {
         list.add((E) "5");
 
         final ListIterator<E> it = list.listIterator();
-        try {
-            it.remove();
-        } catch (final IllegalStateException e) {
-            // expected
-        }
+        assertThrows(IllegalStateException.class, it::remove);
         assertEquals("1", it.next());
         assertEquals("2", it.next());
         assertEquals("[1, 2, 3, 4, 5]", list.toString());
@@ -1143,11 +1104,7 @@ public class CursorableLinkedListTest<E> extends AbstractLinkedListTest<E> {
         assertEquals("3", it.next());
         it.remove();
         assertEquals("[4, 5]", list.toString());
-        try {
-            it.remove();
-        } catch (final IllegalStateException e) {
-            // expected
-        }
+        assertThrows(IllegalStateException.class, it::remove);
         assertEquals("4", it.next());
         assertEquals("5", it.next());
         it.remove();

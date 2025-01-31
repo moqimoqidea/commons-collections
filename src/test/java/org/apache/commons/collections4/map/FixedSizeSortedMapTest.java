@@ -22,12 +22,11 @@ import java.util.TreeMap;
 /**
  * Extension of {@link AbstractSortedMapTest} for exercising the {@link FixedSizeSortedMap}
  * implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class FixedSizeSortedMapTest<K, V> extends AbstractSortedMapTest<K, V> {
-
-    public FixedSizeSortedMapTest() {
-        super(FixedSizeSortedMapTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {

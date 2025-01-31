@@ -78,6 +78,16 @@ public class TreeBag<E> extends AbstractMapBag<E> implements SortedBag<E>, Seria
     }
 
     /**
+     * Constructs a bag containing all the members of the given Iterable.
+     *
+     * @param iterable an iterable to copy into this bag.
+     * @since 4.5.0-M3
+     */
+    public TreeBag(final Iterable<? extends E> iterable) {
+        super(new TreeMap<>(), iterable);
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @throws IllegalArgumentException if the object to be added does not implement
@@ -116,11 +126,11 @@ public class TreeBag<E> extends AbstractMapBag<E> implements SortedBag<E>, Seria
     }
 
     /**
-     * Read the bag in using a custom routine.
+     * Deserializes the bag in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -130,10 +140,10 @@ public class TreeBag<E> extends AbstractMapBag<E> implements SortedBag<E>, Seria
     }
 
     /**
-     * Write the bag out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

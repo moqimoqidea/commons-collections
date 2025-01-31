@@ -43,10 +43,6 @@ public class CompositeCollectionTest<E> extends AbstractCollectionTest<E> {
 
     protected Collection<E> two;
 
-    public CompositeCollectionTest() {
-        super(CompositeCollectionTest.class.getSimpleName());
-    }
-
     @Override
     public String getCompatibilityVersion() {
         return "4";
@@ -151,6 +147,8 @@ public class CompositeCollectionTest<E> extends AbstractCollectionTest<E> {
     public void testAddAllMutator() {
         setUpTest();
         c.setMutator(new CompositeCollection.CollectionMutator<E>() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean add(final CompositeCollection<E> composite,
                     final List<Collection<E>> collections, final E obj) {
@@ -200,6 +198,8 @@ public class CompositeCollectionTest<E> extends AbstractCollectionTest<E> {
     public void testAddMutator() {
         setUpTest();
         c.setMutator(new CompositeCollection.CollectionMutator<E>() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean add(final CompositeCollection<E> composite,
                     final List<Collection<E>> collections, final E obj) {

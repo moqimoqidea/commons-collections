@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -33,17 +35,14 @@ import org.apache.commons.collections4.iterators.UniqueFilterIterator;
 /**
  * Provides utility methods and decorators for {@link Iterable} instances.
  * <p>
- * <b>Note</b>: this util class has been designed for fail-fast argument checking.
+ * <strong>Note</strong>: This utility class has been designed with fail-fast argument checking.
  * </p>
  * <ul>
- * <li>
- * all decorator methods are <b>NOT</b> null-safe wrt the provided Iterable argument, i.e.
- * they will throw a {@link NullPointerException} if a null Iterable is passed as argument.
- * <li>
- * all other utility methods are null-safe wrt the provided Iterable argument, i.e. they will
- * treat a null Iterable the same way as an empty one. Other arguments which are null,
- * e.g. a {@link Predicate}, will result in a {@link NullPointerException}. Exception: passing
- * a null {@link Comparator} is equivalent to a Comparator with natural ordering.
+ * <li>All decorator methods are <em>not</em> null-safe for the provided Iterable argument; for example, they will throw a {@link NullPointerException} if a
+ * null Iterable is passed as argument.
+ * <li>All other utility methods are null-safe for the provided Iterable argument; for example, they will treat a null Iterable the same way as an empty one.
+ * For other arguments which are null, a {@link Predicate} will result in a {@link NullPointerException}. Exception: passing a null {@link Comparator} is
+ * equivalent to a Comparator with natural ordering.
  * </ul>
  *
  * @since 4.1
@@ -54,15 +53,15 @@ public class IterableUtils {
      * Inner class to distinguish unmodifiable instances.
      */
     private static final class UnmodifiableIterable<E> extends FluentIterable<E> {
-        private final Iterable<E> unmodifiable;
+        private final Iterable<E> iterable;
 
         UnmodifiableIterable(final Iterable<E> iterable) {
-            this.unmodifiable = iterable;
+            this.iterable = iterable;
         }
 
         @Override
         public Iterator<E> iterator() {
-            return IteratorUtils.unmodifiableIterator(unmodifiable.iterator());
+            return IteratorUtils.unmodifiableIterator(iterable.iterator());
         }
     }
 
@@ -83,6 +82,7 @@ public class IterableUtils {
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to limit, may not be null
@@ -92,7 +92,7 @@ public class IterableUtils {
      * @throws NullPointerException if iterable is null
      */
     public static <E> Iterable<E> boundedIterable(final Iterable<E> iterable, final long maxSize) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         if (maxSize < 0) {
             throw new IllegalArgumentException("MaxSize parameter must not be negative.");
         }
@@ -111,9 +111,11 @@ public class IterableUtils {
      * The returned iterable has an iterator that traverses the elements in the order
      * of the arguments, i.e. iterables[0], iterables[1], .... The source iterators
      * are not polled until necessary.
+     * </p>
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param iterables  the iterables to combine, may not be null
@@ -144,9 +146,11 @@ public class IterableUtils {
      * The returned iterable has an iterator that traverses the elements in {@code a},
      * followed by the elements in {@code b}. The source iterators are not polled until
      * necessary.
+     * </p>
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param a  the first iterable, may not be null
@@ -166,9 +170,11 @@ public class IterableUtils {
      * The returned iterable has an iterator that traverses the elements in {@code a},
      * followed by the elements in {@code b} and {@code c}. The source iterators are
      * not polled until necessary.
+     * </p>
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param a  the first iterable, may not be null
@@ -190,9 +196,11 @@ public class IterableUtils {
      * The returned iterable has an iterator that traverses the elements in {@code a},
      * followed by the elements in {@code b}, {@code c} and {@code d}. The source
      * iterators are not polled until necessary.
+     * </p>
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param a  the first iterable, may not be null
@@ -213,23 +221,13 @@ public class IterableUtils {
     /**
      * Fail-fast check for null arguments.
      *
-     * @param iterable  the iterable to check
-     * @throws NullPointerException if iterable is null
-     */
-    static void checkNotNull(final Iterable<?> iterable) {
-        Objects.requireNonNull(iterable, "iterable");
-    }
-
-    /**
-     * Fail-fast check for null arguments.
-     *
      * @param iterables  the iterables to check
      * @throws NullPointerException if the argument or any of its contents is null
      */
     static void checkNotNull(final Iterable<?>... iterables) {
         Objects.requireNonNull(iterables, "iterables");
         for (final Iterable<?> iterable : iterables) {
-            checkNotNull(iterable);
+            Objects.requireNonNull(iterable, "iterable");
         }
     }
 
@@ -240,6 +238,7 @@ public class IterableUtils {
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the
      * corresponding input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param comparator  the comparator defining an ordering over the elements,
@@ -267,6 +266,7 @@ public class IterableUtils {
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the
      * corresponding input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param a  the first iterable, must not be null
@@ -294,6 +294,7 @@ public class IterableUtils {
      * A {@code null} object will not be passed to the equator, instead a
      * {@link org.apache.commons.collections4.functors.NullPredicate NullPredicate}
      * will be used.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterable} contains
      * @param iterable  the iterable to check, may be null
@@ -312,6 +313,7 @@ public class IterableUtils {
      * Checks if the object is contained in the given iterable.
      * <p>
      * A {@code null} or empty iterable returns false.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterable} contains
      * @param iterable  the iterable to check, may be null
@@ -329,6 +331,7 @@ public class IterableUtils {
      * Counts the number of elements in the input iterable that match the predicate.
      * <p>
      * A {@code null} iterable matches no elements.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterable} contains
      * @param input  the {@link Iterable} to get the input from, may be null
@@ -339,6 +342,62 @@ public class IterableUtils {
     public static <E> long countMatches(final Iterable<E> input, final Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate, "predicate");
         return size(filteredIterable(emptyIfNull(input), predicate));
+    }
+
+    /**
+     * Finds and returns the List of duplicate elements in the given collection.
+     *
+     * @param <E> the type of elements in the collection.
+     * @param iterable the list to test, must not be null.
+     * @return the set of duplicate elements, may be empty.
+     * @since 4.5.0-M3
+     */
+    public static <E> List<E> duplicateList(final Iterable<E> iterable) {
+        return new ArrayList<>(duplicateSequencedSet(iterable));
+    }
+
+    /**
+     * Finds and returns the sequenced Set of duplicate elements in the given collection.
+     * <p>
+     * Once we are on Java 21 and a new major version, the return type should be SequencedSet.
+     * </p>
+     *
+     * @param <E> the type of elements in the collection.
+     * @param iterable the list to test, must not be null.
+     * @return the set of duplicate elements, may be empty.
+     * @since 4.5.0-M3
+     */
+    public static <E> Set<E> duplicateSequencedSet(final Iterable<E> iterable) {
+        return duplicateSet(iterable, new LinkedHashSet<>());
+    }
+
+    /**
+     * Finds and returns the set of duplicate elements in the given collection.
+     *
+     * @param <E> the type of elements in the collection.
+     * @param iterable the list to test, must not be null.
+     * @return the set of duplicate elements, may be empty.
+     * @since 4.5.0-M3
+     */
+    public static <E> Set<E> duplicateSet(final Iterable<E> iterable) {
+        return duplicateSet(iterable, new HashSet<>());
+    }
+
+    /**
+     * Worker method for {@link #duplicateSet(Collection)} and friends.
+     *
+     * @param <C> the type of Collection.
+     * @param <E> the type of elements in the Collection.
+     * @param iterable the list to test, must not be null.
+     * @param duplicates the list to test, must not be null.
+     * @return the set of duplicate elements, may be empty.
+     */
+    static <C extends Collection<E>, E> C duplicateSet(final Iterable<E> iterable, final C duplicates) {
+        final Set<E> set = new HashSet<>();
+        for (final E e : iterable) {
+            (set.contains(e) ? duplicates : set).add(e);
+        }
+        return duplicates;
     }
 
     /**
@@ -357,6 +416,7 @@ public class IterableUtils {
      * Gets an empty iterable.
      * <p>
      * This iterable does not contain any elements.
+     * </p>
      *
      * @param <E> the element type
      * @return an empty iterable
@@ -384,6 +444,7 @@ public class IterableUtils {
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the
      * corresponding input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to filter, may not be null
@@ -393,7 +454,7 @@ public class IterableUtils {
      */
     public static <E> Iterable<E> filteredIterable(final Iterable<E> iterable,
                                                    final Predicate<? super E> predicate) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         Objects.requireNonNull(predicate, "predicate");
         return new FluentIterable<E>() {
             @Override
@@ -407,6 +468,7 @@ public class IterableUtils {
      * Finds the first element in the given iterable which matches the given predicate.
      * <p>
      * A {@code null} or empty iterator returns null.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to search, may be null
@@ -431,7 +493,7 @@ public class IterableUtils {
      * @param <T> the type of object in the {@link Iterable}.
      * @param iterable  the {@link Iterable} to get a value from, may be null
      * @return the first object
-     * @throws IndexOutOfBoundsException if the request  is invalid
+     * @throws IndexOutOfBoundsException if the request is invalid
      * @since 4.2
      */
     public static <T> T first(final Iterable<T> iterable) {
@@ -454,6 +516,7 @@ public class IterableUtils {
      * Executes the given closure on each but the last element in the iterable.
      * <p>
      * If the input iterable is null no change is made.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterable} contains
      * @param iterable  the iterable to get the input from, may be null
@@ -488,6 +551,7 @@ public class IterableUtils {
      * {@code IndexOutOfBoundsException} if there is no such element.
      * <p>
      * If the {@link Iterable} is a {@link List}, then it will use {@link List#get(int)}.
+     * </p>
      *
      * @param <T> the type of object in the {@link Iterable}.
      * @param iterable  the {@link Iterable} to get a value from, may be null
@@ -508,6 +572,7 @@ public class IterableUtils {
      * matches the given predicate.
      * <p>
      * A {@code null} or empty iterable returns -1.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to search, may be null
@@ -523,6 +588,7 @@ public class IterableUtils {
      * Answers true if the provided iterable is empty.
      * <p>
      * A {@code null} iterable returns true.
+     * </p>
      *
      * @param iterable  the {@link Iterable to use}, may be null
      * @return true if the iterable is null or empty, false otherwise
@@ -543,6 +609,7 @@ public class IterableUtils {
      * cycles omit the removed element, which is no longer in {@code iterable}. The
      * iterator's {@code hasNext()} method returns {@code true} until {@code iterable}
      * is empty.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to loop, may not be null
@@ -550,7 +617,7 @@ public class IterableUtils {
      * @throws NullPointerException if iterable is null
      */
     public static <E> Iterable<E> loopingIterable(final Iterable<E> iterable) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         return new FluentIterable<E>() {
             @Override
             public Iterator<E> iterator() {
@@ -571,6 +638,7 @@ public class IterableUtils {
      * Answers true if a predicate is true for every element of an iterable.
      * <p>
      * A {@code null} or empty iterable returns true.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterable} contains
      * @param iterable  the {@link Iterable} to use, may be null
@@ -587,6 +655,7 @@ public class IterableUtils {
      * Answers true if a predicate is true for any element of the iterable.
      * <p>
      * A {@code null} or empty iterable returns false.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterable} contains
      * @param iterable  the {@link Iterable} to use, may be null
@@ -605,6 +674,7 @@ public class IterableUtils {
      * For each predicate, the returned list will contain a collection holding
      * all elements of the input iterable matching the predicate. The last collection
      * contained in the list will hold all elements which didn't match any predicate:
+     * </p>
      * <pre>
      *  [C1, C2, R] = partition(I, P1, P2) with
      *  I = input
@@ -615,16 +685,19 @@ public class IterableUtils {
      *  R = collection of elements rejected by all predicates
      * </pre>
      * <p>
-     * <b>Note</b>: elements are only added to the output collection of the first matching
+     * <strong>Note</strong>: elements are only added to the output collection of the first matching
      * predicate, determined by the order of arguments.
+     * </p>
      * <p>
      * If the input iterable is {@code null}, the same is returned as for an
      * empty iterable.
      * If no predicates have been provided, all elements of the input collection
      * will be added to the rejected collection.
+     * </p>
      * <p>
      * Example: for an input list [1, 2, 3, 4, 5] calling partition with predicates [x &lt; 3]
      * and [x &lt; 5] will result in the following output: [[1, 2], [3, 4], [5]].
+     * </p>
      *
      * @param <O>  the type of object the {@link Iterable} contains
      * @param <R>  the type of the output {@link Collection}
@@ -650,7 +723,7 @@ public class IterableUtils {
 
         if (predicates.length < 1) {
             // return the entire input collection as a single partition
-            final R singlePartition = partitionFactory.create();
+            final R singlePartition = partitionFactory.get();
             CollectionUtils.addAll(singlePartition, iterable);
             return Collections.singletonList(singlePartition);
         }
@@ -660,7 +733,7 @@ public class IterableUtils {
         final int numberOfPartitions = numberOfPredicates + 1;
         final List<R> partitions = new ArrayList<>(numberOfPartitions);
         for (int i = 0; i < numberOfPartitions; ++i) {
-            partitions.add(partitionFactory.create());
+            partitions.add(partitionFactory.get());
         }
 
         // for each element in inputCollection:
@@ -670,7 +743,7 @@ public class IterableUtils {
         for (final O element : iterable) {
             boolean elementAssigned = false;
             for (int i = 0; i < numberOfPredicates; ++i) {
-                if (predicates[i].evaluate(element)) {
+                if (predicates[i].test(element)) {
                     partitions.get(i).add(element);
                     elementAssigned = true;
                     break;
@@ -694,6 +767,7 @@ public class IterableUtils {
      * For each predicate, the result will contain a list holding all elements of the
      * input iterable matching the predicate. The last list will hold all elements
      * which didn't match any predicate:
+     * </p>
      * <pre>
      *  [C1, R] = partition(I, P1) with
      *  I = input
@@ -704,9 +778,11 @@ public class IterableUtils {
      * <p>
      * If the input iterable is {@code null}, the same is returned as for an
      * empty iterable.
+     * </p>
      * <p>
      * Example: for an input list [1, 2, 3, 4, 5] calling partition with a predicate [x &lt; 3]
      * will result in the following output: [[1, 2], [3, 4, 5]].
+     * </p>
      *
      * @param <O>  the type of object the {@link Iterable} contains
      * @param iterable  the iterable to partition, may be null
@@ -731,6 +807,7 @@ public class IterableUtils {
      * For each predicate, the result will contain a list holding all elements of the
      * input iterable matching the predicate. The last list will hold all elements
      * which didn't match any predicate:
+     * </p>
      * <pre>
      *  [C1, C2, R] = partition(I, P1, P2) with
      *  I = input
@@ -741,14 +818,17 @@ public class IterableUtils {
      *  R = collection of elements rejected by all predicates
      * </pre>
      * <p>
-     * <b>Note</b>: elements are only added to the output collection of the first matching
+     * <strong>Note</strong>: elements are only added to the output collection of the first matching
      * predicate, determined by the order of arguments.
+     * </p>
      * <p>
      * If the input iterable is {@code null}, the same is returned as for an
      * empty iterable.
+     * </p>
      * <p>
      * Example: for an input list [1, 2, 3, 4, 5] calling partition with predicates [x &lt; 3]
      * and [x &lt; 5] will result in the following output: [[1, 2], [3, 4], [5]].
+     * </p>
      *
      * @param <O>  the type of object the {@link Iterable} contains
      * @param iterable  the collection to get the input from, may be null
@@ -770,9 +850,11 @@ public class IterableUtils {
      * In case the provided iterable is a {@link List} instance, a
      * {@link ReverseListIterator} will be used to reverse the traversal
      * order, otherwise an intermediate {@link List} needs to be created.
+     * </p>
      * <p>
      * The returned iterable's iterator supports {@code remove()} if the
      * provided iterable is a {@link List} instance.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to use, may not be null
@@ -781,7 +863,7 @@ public class IterableUtils {
      * @see ReverseListIterator
      */
     public static <E> Iterable<E> reversedIterable(final Iterable<E> iterable) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         return new FluentIterable<E>() {
             @Override
             public Iterator<E> iterator() {
@@ -797,6 +879,7 @@ public class IterableUtils {
      * Returns the number of elements contained in the given iterator.
      * <p>
      * A {@code null} or empty iterator returns {@code 0}.
+     * </p>
      *
      * @param iterable  the iterable to check, may be null
      * @return the number of elements contained in the iterable
@@ -816,6 +899,7 @@ public class IterableUtils {
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to use, may not be null
@@ -825,7 +909,7 @@ public class IterableUtils {
      * @throws NullPointerException if iterable is null
      */
     public static <E> Iterable<E> skippingIterable(final Iterable<E> iterable, final long elementsToSkip) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         if (elementsToSkip < 0) {
             throw new IllegalArgumentException("ElementsToSkip parameter must not be negative.");
         }
@@ -856,6 +940,7 @@ public class IterableUtils {
      * enclosed in square brackets ({@code "[]"}). Adjacent elements are separated
      * by the characters {@code ", "} (a comma followed by a space). Elements are
      * converted to strings as by {@code String.valueOf(Object)}.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to convert to a string, may be null
@@ -872,6 +957,7 @@ public class IterableUtils {
      * enclosed in square brackets ({@code "[]"}). Adjacent elements are separated
      * by the characters {@code ", "} (a comma followed by a space). Elements are
      * converted to strings as by using the provided {@code transformer}.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to convert to a string, may be null
@@ -892,6 +978,7 @@ public class IterableUtils {
      * enclosed by the provided {@code prefix} and {@code suffix}. Adjacent elements
      * are separated by the provided {@code delimiter}. Elements are converted to
      * strings as by using the provided {@code transformer}.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to convert to a string, may be null
@@ -917,6 +1004,7 @@ public class IterableUtils {
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <I>  the input element type
      * @param <O>  the output element type
@@ -927,7 +1015,7 @@ public class IterableUtils {
      */
     public static <I, O> Iterable<O> transformedIterable(final Iterable<I> iterable,
                                                          final Transformer<? super I, ? extends O> transformer) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         Objects.requireNonNull(transformer, "transformer");
         return new FluentIterable<O>() {
             @Override
@@ -943,6 +1031,7 @@ public class IterableUtils {
      * The returned iterable's iterator supports {@code remove()} when the
      * corresponding input iterator supports it. Calling {@code remove()}
      * will only remove a single element from the underlying iterator.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to use, may not be null
@@ -950,7 +1039,7 @@ public class IterableUtils {
      * @throws NullPointerException if iterable is null
      */
     public static <E> Iterable<E> uniqueIterable(final Iterable<E> iterable) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         return new FluentIterable<E>() {
             @Override
             public Iterator<E> iterator() {
@@ -963,6 +1052,7 @@ public class IterableUtils {
      * Returns an unmodifiable view of the given iterable.
      * <p>
      * The returned iterable's iterator does not support {@code remove()}.
+     * </p>
      *
      * @param <E> the element type
      * @param iterable  the iterable to use, may not be null
@@ -970,7 +1060,7 @@ public class IterableUtils {
      * @throws NullPointerException if iterable is null
      */
     public static <E> Iterable<E> unmodifiableIterable(final Iterable<E> iterable) {
-        checkNotNull(iterable);
+        Objects.requireNonNull(iterable, "iterable");
         if (iterable instanceof UnmodifiableIterable<?>) {
             return iterable;
         }
@@ -983,9 +1073,11 @@ public class IterableUtils {
      * The returned iterable has an iterator that traverses the elements in {@code a}
      * and {@code b} in alternating order. The source iterators are not polled until
      * necessary.
+     * </p>
      * <p>
      * The returned iterable's iterator supports {@code remove()} when the corresponding
      * input iterator supports it.
+     * </p>
      *
      * @param <E> the element type
      * @param a  the first iterable, may not be null
@@ -995,8 +1087,8 @@ public class IterableUtils {
      */
     public static <E> Iterable<E> zippingIterable(final Iterable<? extends E> a,
                                                   final Iterable<? extends E> b) {
-        checkNotNull(a);
-        checkNotNull(b);
+        Objects.requireNonNull(a, "iterable");
+        Objects.requireNonNull(b, "iterable");
         return new FluentIterable<E>() {
             @Override
             public Iterator<E> iterator() {
@@ -1008,29 +1100,27 @@ public class IterableUtils {
     /**
      * Interleaves two iterables into a single iterable.
      * <p>
-     * The returned iterable has an iterator that traverses the elements in {@code a}
-     * and {@code b} in alternating order. The source iterators are not polled until
-     * necessary.
+     * The returned iterable has an iterator that traverses the elements in {@code a} and {@code b} in alternating order. The source iterators are not polled
+     * until necessary.
+     * </p>
      * <p>
-     * The returned iterable's iterator supports {@code remove()} when the corresponding
-     * input iterator supports it.
+     * The returned iterable's iterator supports {@code remove()} when the corresponding input iterator supports it.
+     * </p>
      *
-     * @param <E> the element type
+     * @param <E>    the element type
      * @param first  the first iterable, may not be null
-     * @param others  the array of iterables to interleave, may not be null
+     * @param others the array of iterables to interleave, may not be null
      * @return a new iterable, interleaving the provided iterables
      * @throws NullPointerException if either of the provided iterables is null
      */
-    public static <E> Iterable<E> zippingIterable(final Iterable<? extends E> first,
-                                                  final Iterable<? extends E>... others) {
-        checkNotNull(first);
+    public static <E> Iterable<E> zippingIterable(final Iterable<? extends E> first, final Iterable<? extends E>... others) {
+        Objects.requireNonNull(first, "iterable");
         checkNotNull(others);
         return new FluentIterable<E>() {
             @Override
             public Iterator<E> iterator() {
                 @SuppressWarnings("unchecked") // safe
-                final
-                Iterator<? extends E>[] iterators = new Iterator[others.length + 1];
+                final Iterator<? extends E>[] iterators = new Iterator[others.length + 1];
                 iterators[0] = first.iterator();
                 for (int i = 0; i < others.length; i++) {
                     iterators[i + 1] = others[i].iterator();
@@ -1040,4 +1130,13 @@ public class IterableUtils {
         };
     }
 
+    /**
+     * Make private in 5.0.
+     *
+     * @deprecated TODO Make private in 5.0.
+     */
+    @Deprecated
+    public IterableUtils() {
+        // empty
+    }
 }

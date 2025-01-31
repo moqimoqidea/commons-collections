@@ -20,24 +20,15 @@ import org.apache.commons.collections4.collection.AbstractCollectionTest;
 
 /**
  * JUnit tests.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class DualHashBidiMapTest<K, V> extends AbstractBidiMapTest<K, V> {
-
-    public DualHashBidiMapTest() {
-        super(DualHashBidiMapTest.class.getSimpleName());
-    }
 
     @Override
     protected int getIterationBehaviour() {
         return AbstractCollectionTest.UNORDERED;
-    }
-
-    /**
-     * Override to prevent infinite recursion of tests.
-     */
-    @Override
-    public String[] ignoredTests() {
-        return new String[] { "DualHashBidiMapTest.bulkTestInverseMap.bulkTestInverseMap" };
     }
 
     /**

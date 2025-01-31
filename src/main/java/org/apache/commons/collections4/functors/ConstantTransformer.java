@@ -17,6 +17,7 @@
 package org.apache.commons.collections4.functors;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.apache.commons.collections4.Transformer;
 
@@ -28,9 +29,11 @@ import org.apache.commons.collections4.Transformer;
  * use the prototype factory.
  * </p>
  *
+ * @param <T> the type of the input to the function.
+ * @param <R> the type of the result of the function.
  * @since 3.0
  */
-public class ConstantTransformer<I, O> implements Transformer<I, O>, Serializable {
+public class ConstantTransformer<T, R> implements Transformer<T, R>, Serializable {
 
     /** Serial version UID */
     private static final long serialVersionUID = 6374440726369055124L;
@@ -66,7 +69,7 @@ public class ConstantTransformer<I, O> implements Transformer<I, O>, Serializabl
     }
 
     /** The closures to call in turn */
-    private final O iConstant;
+    private final R iConstant;
 
     /**
      * Constructor that performs no validation.
@@ -74,7 +77,7 @@ public class ConstantTransformer<I, O> implements Transformer<I, O>, Serializabl
      *
      * @param constantToReturn  the constant to return each time
      */
-    public ConstantTransformer(final O constantToReturn) {
+    public ConstantTransformer(final R constantToReturn) {
         iConstant = constantToReturn;
     }
 
@@ -90,7 +93,7 @@ public class ConstantTransformer<I, O> implements Transformer<I, O>, Serializabl
             return false;
         }
         final Object otherConstant = ((ConstantTransformer<?, ?>) obj).getConstant();
-        return otherConstant == getConstant() || otherConstant != null && otherConstant.equals(getConstant());
+        return Objects.equals(otherConstant, getConstant());
     }
 
     /**
@@ -99,7 +102,7 @@ public class ConstantTransformer<I, O> implements Transformer<I, O>, Serializabl
      * @return the constant
      * @since 3.1
      */
-    public O getConstant() {
+    public R getConstant() {
         return iConstant;
     }
 
@@ -122,7 +125,7 @@ public class ConstantTransformer<I, O> implements Transformer<I, O>, Serializabl
      * @return the stored constant
      */
     @Override
-    public O transform(final I input) {
+    public R transform(final T input) {
         return iConstant;
     }
 }

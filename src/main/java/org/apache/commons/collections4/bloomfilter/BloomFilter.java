@@ -21,20 +21,22 @@ import java.util.Objects;
 /**
  * The interface that describes a Bloom filter.
  * <p>
- * <em>See implementation notes for BitMapProducer and IndexProducer.</em>
+ * <em>See implementation notes for {@link BitMapExtractor} and {@link IndexExtractor}.</em>
  * </p>
- * @see BitMapProducer
- * @see IndexProducer
- * @since 4.5
+ *
+ * @param <T> The BloomFilter type.
+ * @see BitMapExtractor
+ * @see IndexExtractor
+ * @since 4.5.0-M1
  */
-public interface BloomFilter extends IndexProducer, BitMapProducer {
+public interface BloomFilter<T extends BloomFilter<T>> extends IndexExtractor, BitMapExtractor {
 
     /**
-     * The sparse characteristic used to determine the best method for matching.
-     * <p>For `sparse` implementations
-     * the {@code forEachIndex(IntConsumer consumer)} method is more efficient. For non `sparse` implementations
-     * the {@code forEachBitMap(LongConsumer consumer)} is more efficient. Implementers should determine if it is easier
-     * for the implementation to produce indexes of bit map blocks.</p>
+     * The sparse characteristic used to determine the best method for matching: {@value}.
+     * <p>
+     * For `sparse` implementations the {@code forEachIndex(IntConsumer consumer)} method is more efficient. For non `sparse` implementations the
+     * {@code forEachBitMap(LongConsumer consumer)} is more efficient. Implementers should determine if it is easier.
+     * </p>
      */
     int SPARSE = 0x1;
 
@@ -50,27 +52,29 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
     // Query Operations
 
     /**
-     * Returns the characteristics of the filter.
+     * Gets the characteristics of the filter.
      * <p>
      * Characteristics are defined as bits within the characteristics integer.
+     * </p>
+     *
      * @return the characteristics for this bloom filter.
      */
     int characteristics();
 
     /**
-     * Resets the filter to its initial, unpopulated state.
+     * Clears the filter to by resetting it to its initial, unpopulated state.
      */
     void clear();
 
     /**
      * Returns {@code true} if this filter contains the bits specified in the bit maps produced by the
-     * bitMapProducer.
+     * bitMapExtractor.
      *
-     * @param bitMapProducer the {@code BitMapProducer} to provide the bit maps.
+     * @param bitMapExtractor the {@code BitMapExtractor} to provide the bit maps.
      * @return {@code true} if this filter is enabled for all bits specified by the bit maps
      */
-    default boolean contains(final BitMapProducer bitMapProducer) {
-        return forEachBitMapPair(bitMapProducer, (x, y) -> (x & y) == y);
+    default boolean contains(final BitMapExtractor bitMapExtractor) {
+        return processBitMapPairs(bitMapExtractor, (x, y) -> (x & y) == y);
     }
 
     /**
@@ -84,9 +88,9 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
      * @param other the other Bloom filter
      * @return true if all enabled bits in the other filter are enabled in this filter.
      */
-    default boolean contains(final BloomFilter other) {
+    default boolean contains(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
-        return (characteristics() & SPARSE) != 0 ? contains((IndexProducer) other) : contains((BitMapProducer) other);
+        return (characteristics() & SPARSE) != 0 ? contains((IndexExtractor) other) : contains((BitMapExtractor) other);
     }
 
     /**
@@ -106,21 +110,22 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
     }
 
     /**
-     * Returns {@code true} if this filter contains the indices specified IndexProducer.
+     * Returns {@code true} if this filter contains the indices specified IndexExtractor.
      *
      * <p>Specifically this returns {@code true} if this filter is enabled for all bit indexes
-     * identified by the {@code IndexProducer}.</p>
+     * identified by the {@code IndexExtractor}.</p>
      *
-     * @param indexProducer the IndexProducer to provide the indexes
-     * @return {@code true} if this filter is enabled for all bits specified by the IndexProducer
+     * @param indexExtractor the IndexExtractor to provide the indexes
+     * @return {@code true} if this filter is enabled for all bits specified by the IndexExtractor
      */
-    boolean contains(IndexProducer indexProducer);
+    boolean contains(IndexExtractor indexExtractor);
 
     /**
-     * Creates a new instance of the BloomFilter with the same properties as the current one.
-     * @return a copy of this BloomFilter
+     * Creates a new instance of this {@link BloomFilter} with the same properties as the current one.
+     *
+     * @return a copy of this {@link BloomFilter}.
      */
-    BloomFilter copy();
+    T copy();
 
     // update operations
 
@@ -140,7 +145,7 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
      * @see #estimateN()
      * @see Shape
      */
-    default int estimateIntersection(final BloomFilter other) {
+    default int estimateIntersection(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
         final double eThis = getShape().estimateN(cardinality());
         final double eOther = getShape().estimateN(other.cardinality());
@@ -155,18 +160,18 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
         } else if (Double.isInfinite(eOther)) {
             estimate = Math.round(eThis);
         } else {
-            final BloomFilter union = this.copy();
+            final T union = this.copy();
             union.merge(other);
             final double eUnion = getShape().estimateN(union.cardinality());
             if (Double.isInfinite(eUnion)) {
                 throw new IllegalArgumentException("The estimated N for the union of the filters is infinite");
             }
             // maximum estimate value using integer values is: 46144189292 thus
-            // eThis + eOther can not overflow the long value.
+            // eThis + eOther cannot overflow the long value.
             estimate = Math.round(eThis + eOther - eUnion);
             estimate = estimate < 0 ? 0 : estimate;
         }
-        return estimate>Integer.MAX_VALUE?Integer.MAX_VALUE:(int) estimate;
+        return estimate > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) estimate;
     }
 
     /**
@@ -218,11 +223,11 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
      * @see #estimateN()
      * @see Shape
      */
-    default int estimateUnion(final BloomFilter other) {
+    default int estimateUnion(final BloomFilter<?> other) {
         Objects.requireNonNull(other, "other");
-        final BloomFilter cpy = this.copy();
-        cpy.merge(other);
-        return cpy.estimateN();
+        final T copy = this.copy();
+        copy.merge(other);
+        return copy.estimateN();
     }
 
     /**
@@ -238,14 +243,14 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
      * {@code cardinality() == 0}.
      *
      * <p>
-     * <em>Note: This method is optimised for non-sparse filters.</em> Implementers
+     * <em>Note: This method is optimized for non-sparse filters.</em> Implementers
      * are encouraged to implement faster checks if possible.
      * </p>
      *
      * @return {@code true} if no bits are enabled, {@code false} otherwise.
      */
     default boolean isEmpty() {
-        return forEachBitMap(y -> y == 0);
+        return processBitMaps(y -> y == 0);
     }
 
     /**
@@ -261,18 +266,18 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
 
     /**
      * Merges the specified hasher into this Bloom filter. Specifically all
-     * bit indexes that are identified by the {@code producer} will be enabled in this filter.
+     * bit indexes that are identified by the {@code bitMapExtractor} will be enabled in this filter.
      *
      * <p><em>Note: This method should return {@code true} even if no additional bit indexes were
      * enabled. A {@code false} result indicates that this filter may or may not contain all the indexes
-     * enabled in the {@code producer}.</em>  This state may occur in complex Bloom filter implementations like
+     * enabled in the {@code bitMapExtractor}.</em>  This state may occur in complex Bloom filter implementations like
      * counting Bloom filters.</p>
      *
-     * @param bitMapProducer The producer to merge.
+     * @param bitMapExtractor The BitMapExtractor to merge.
      * @return true if the merge was successful
-     * @throws IllegalArgumentException if producer sends illegal value.
+     * @throws IllegalArgumentException if bitMapExtractor sends illegal value.
      */
-    boolean merge(BitMapProducer bitMapProducer);
+    boolean merge(BitMapExtractor bitMapExtractor);
 
     /**
      * Merges the specified Bloom filter into this Bloom filter.
@@ -288,8 +293,8 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
      * @param other The bloom filter to merge into this one.
      * @return true if the merge was successful
      */
-    default boolean merge(final BloomFilter other) {
-        return (characteristics() & SPARSE) != 0 ? merge((IndexProducer) other) : merge((BitMapProducer) other);
+    default boolean merge(final BloomFilter<?> other) {
+        return (characteristics() & SPARSE) != 0 ? merge((IndexExtractor) other) : merge((BitMapExtractor) other);
     }
 
     /**
@@ -311,25 +316,25 @@ public interface BloomFilter extends IndexProducer, BitMapProducer {
     }
 
     /**
-     * Merges the specified IndexProducer into this Bloom filter. Specifically all
-     * bit indexes that are identified by the {@code producer} will be enabled in this filter.
+     * Merges the specified IndexExtractor into this Bloom filter. Specifically all
+     * bit indexes that are identified by the {@code indexExtractor} will be enabled in this filter.
      *
      * <p><em>Note: This method should return {@code true} even if no additional bit indexes were
      * enabled. A {@code false} result indicates that this filter may or may not contain all the indexes of
-     * the {@code producer}.</em>  This state may occur in complex Bloom filter implementations like
+     * the {@code indexExtractor}.</em>  This state may occur in complex Bloom filter implementations like
      * counting Bloom filters.</p>
      *
-     * @param indexProducer The IndexProducer to merge.
+     * @param indexExtractor The IndexExtractor to merge.
      * @return true if the merge was successful
-     * @throws IllegalArgumentException if producer sends illegal value.
+     * @throws IllegalArgumentException if indexExtractor sends illegal value.
      */
-    boolean merge(IndexProducer indexProducer);
+    boolean merge(IndexExtractor indexExtractor);
 
     /**
-     * Most Bloom filters create unique IndexProducers.
+     * Most Bloom filters create unique IndexExtractors.
      */
     @Override
-    default IndexProducer uniqueIndices() {
+    default IndexExtractor uniqueIndices() {
         return this;
     }
 }

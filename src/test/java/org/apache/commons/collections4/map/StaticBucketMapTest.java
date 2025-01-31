@@ -26,23 +26,11 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests.
  * {@link StaticBucketMap}.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class StaticBucketMapTest<K, V> extends AbstractIterableMapTest<K, V> {
-
-    public StaticBucketMapTest() {
-        super(StaticBucketMapTest.class.getSimpleName());
-    }
-
-    @Override
-    public String[] ignoredTests() {
-        final String pre = "StaticBucketMapTest.bulkTestMap";
-        final String post = ".testCollectionIteratorFailFast";
-        return new String[] {
-            pre + "EntrySet" + post,
-            pre + "KeySet" + post,
-            pre + "Values" + post
-        };
-    }
 
     /**
      * {@inheritDoc}

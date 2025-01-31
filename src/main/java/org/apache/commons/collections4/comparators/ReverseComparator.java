@@ -26,7 +26,6 @@ import org.apache.commons.collections4.ComparatorUtils;
  * to its {@link #compare(Object, Object) compare} method.
  *
  * @param <E> the type of objects compared by this comparator
- *
  * @since 2.0
  * @see java.util.Collections#reverseOrder()
  */
@@ -42,7 +41,7 @@ public class ReverseComparator<E> implements Comparator<E>, Serializable {
      * Creates a comparator that compares objects based on the inverse of their
      * natural ordering.  Using this Constructor will create a ReverseComparator
      * that is functionally identical to the Comparator returned by
-     * java.util.Collections.<b>reverseOrder()</b>.
+     * java.util.Collections.<strong>reverseOrder()</strong>.
      *
      * @see java.util.Collections#reverseOrder()
      */
@@ -75,12 +74,12 @@ public class ReverseComparator<E> implements Comparator<E>, Serializable {
     }
 
     /**
-     * Returns {@code true} iff <i>that</i> Object is
+     * Returns {@code true} iff <em>that</em> Object is
      * a {@link Comparator} whose ordering is known to be
      * equivalent to mine.
      * <p>
      * This implementation returns {@code true}
-     * iff {@code <i>object</i>.{@link Object#getClass() getClass()}}
+     * iff {@code <em>object</em>.{@link Object#getClass() getClass()}}
      * equals {@code this.getClass()}, and the underlying
      * comparators are equal.
      * Subclasses may want to override this behavior to remain consistent

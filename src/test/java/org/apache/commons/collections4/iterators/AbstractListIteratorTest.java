@@ -35,17 +35,11 @@ import org.junit.jupiter.api.Test;
  * Concrete subclasses must provide the list iterator to be tested.
  * They must also specify certain details of how the list iterator operates by
  * overriding the supportsXxx() methods if necessary.
+ * </p>
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public abstract class AbstractListIteratorTest<E> extends AbstractIteratorTest<E> {
-
-    /**
-     * JUnit constructor.
-     *
-     * @param testName  the test class name
-     */
-    public AbstractListIteratorTest(final String testName) {
-        super(testName);
-    }
 
     /**
      * The value to be used in the add and set tests.

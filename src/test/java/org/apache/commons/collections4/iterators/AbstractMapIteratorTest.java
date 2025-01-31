@@ -38,17 +38,12 @@ import org.junit.jupiter.api.Test;
  * Concrete subclasses must provide the list iterator to be tested.
  * They must also specify certain details of how the list iterator operates by
  * overriding the supportsXxx() methods if necessary.
+ * </p>
+ *
+ * @param <K> the type of the keys in the maps tested.
+ * @param <V> the type of the values in the maps tested.
  */
 public abstract class AbstractMapIteratorTest<K, V> extends AbstractIteratorTest<K> {
-
-    /**
-     * JUnit constructor.
-     *
-     * @param testName  the test class name
-     */
-    public AbstractMapIteratorTest(final String testName) {
-        super(testName);
-    }
 
     /**
      * The values to be used in the add and set tests.
@@ -295,16 +290,12 @@ public abstract class AbstractMapIteratorTest<K, V> extends AbstractIteratorTest
             assertThrows(UnsupportedOperationException.class, () -> it.remove());
             return;
         }
-
         it.remove();
         confirmed.remove(key);
         assertFalse(map.containsKey(key));
         verify();
-
-        try {
-            it.remove();  // second remove fails
-        } catch (final IllegalStateException ex) {
-        }
+        // second remove fails
+        assertThrows(NoSuchElementException.class, it::remove, "Full iterators must have at least one element");
         verify();
     }
 

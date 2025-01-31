@@ -38,6 +38,9 @@ import org.junit.jupiter.api.Test;
 /**
  * Extension of {@link PredicatedMapTest} for exercising the
  * {@link PredicatedSortedMap} implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class PredicatedSortedMapTest<K, V> extends AbstractSortedMapTest<K, V> {
 
@@ -53,10 +56,6 @@ public class PredicatedSortedMapTest<K, V> extends AbstractSortedMapTest<K, V> {
     protected static final Predicate<Object> testPredicate = String.class::isInstance;
 
     protected final Comparator<K> reverseStringComparator = new ReverseStringComparator();
-
-    public PredicatedSortedMapTest() {
-        super(PredicatedSortedMapTest.class.getSimpleName());
-    }
 
     protected SortedMap<K, V> decorateMap(final SortedMap<K, V> map, final Predicate<? super K> keyPredicate,
         final Predicate<? super V> valuePredicate) {

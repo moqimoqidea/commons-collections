@@ -37,19 +37,19 @@ import org.apache.commons.collections4.iterators.AbstractOrderedMapIteratorTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link OrderedMap} methods and contracts.
+ * Tests {@link OrderedMap}.
+ *
+ * @param <K> the type of the keys in the maps tested.
+ * @param <V> the type of the values in the maps tested.
  */
 public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
     public class InnerTestOrderedMapIterator extends AbstractOrderedMapIteratorTest<K, V> {
-        public InnerTestOrderedMapIterator() {
-            super("InnerTestOrderedMapIterator");
-        }
 
         @Override
         public Map<K, V> getConfirmedMap() {
             // assumes makeFullMapIterator() called first
-            return AbstractOrderedMapTest.this.getConfirmed();
+            return getConfirmed();
         }
 
         @Override
@@ -77,12 +77,12 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
 
         @Override
         public boolean supportsRemove() {
-            return AbstractOrderedMapTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
         public boolean supportsSetValue() {
-            return AbstractOrderedMapTest.this.isSetValueSupported();
+            return isSetValueSupported();
         }
 
         @Override
@@ -90,15 +90,6 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
             super.verify();
             AbstractOrderedMapTest.this.verify();
         }
-    }
-
-    /**
-     * JUnit constructor.
-     *
-     * @param testName  the test name
-     */
-    public AbstractOrderedMapTest(final String testName) {
-        super(testName);
     }
 
     public BulkTest bulkTestOrderedMapIterator() {
@@ -114,8 +105,7 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
     }
 
     /**
-     * The only confirmed collection we have that is ordered is the sorted one.
-     * Thus, sort the keys.
+     * The only confirmed collection we have that is ordered is the sorted one. Thus, sort the keys.
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -186,7 +176,8 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
         if (!isAllowNullKey()) {
             try {
                 assertNull(ordered.nextKey(null)); // this is allowed too
-            } catch (final NullPointerException ex) {}
+            } catch (final NullPointerException ex) {
+            }
         } else {
             assertNull(ordered.nextKey(null));
         }
@@ -218,7 +209,8 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
         if (!isAllowNullKey()) {
             try {
                 assertNull(ordered.previousKey(null)); // this is allowed too
-            } catch (final NullPointerException ex) {}
+            } catch (final NullPointerException ex) {
+            }
         } else {
             assertNull(ordered.previousKey(null));
         }
@@ -239,10 +231,8 @@ public abstract class AbstractOrderedMapTest<K, V> extends AbstractIterableMapTe
         if (!isAllowNullKey()) {
             final OrderedMap<K, V> finalOrdered = ordered;
             assertThrows(NullPointerException.class, () -> finalOrdered.previousKey(null));
-        } else {
-            if (!isAllowNullKey()) {
-                assertNull(ordered.previousKey(null));
-            }
+        } else if (!isAllowNullKey()) {
+            assertNull(ordered.previousKey(null));
         }
     }
 

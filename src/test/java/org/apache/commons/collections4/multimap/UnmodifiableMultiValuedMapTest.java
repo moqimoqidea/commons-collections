@@ -21,10 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -37,23 +39,32 @@ import org.apache.commons.collections4.collection.AbstractCollectionTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for UnmodifiableMultiValuedMap
+ * Tests {@link UnmodifiableMultiValuedMap}.
  */
 public class UnmodifiableMultiValuedMapTest<K, V> extends AbstractMultiValuedMapTest<K, V> {
 
-    public UnmodifiableMultiValuedMapTest() {
-        super(UnmodifiableMultiValuedMapTest.class.getSimpleName());
-    }
-
     /**
-     * Assert the given map contains all added values after it was initialized
+     * Asserts the given map contains all added values after it was initialized
      * with makeFullMap(). See COLLECTIONS-769.
+     *
      * @param map the MultiValuedMap<K, V> to check
      */
     private void assertMapContainsAllValues(final MultiValuedMap<K, V> map) {
-        assertEquals("[uno, un]", map.get((K) "one").toString());
-        assertEquals("[dos, deux]", map.get((K) "two").toString());
-        assertEquals("[tres, trois]", map.get((K) "three").toString());
+        final int maxK = getSampleKeySize();
+        final int cpk = getSampleCountPerKey();
+        for (int k = 0; k < maxK; k++) {
+            final K key = makeKey(k);
+            final Collection<V> collection = map.get((K) key);
+            assertEquals(cpk, collection.size());
+            final String toString = collection.toString();
+            final List<V> expected = new ArrayList<>(cpk);
+            for (int j = 0; j < cpk; j++) {
+                expected.add(makeValue(k, j));
+            }
+            assertEquals(expected.size(), collection.size());
+            assertEquals(expected, new ArrayList<>(collection));
+            assertEquals(expected.toString(), toString);
+        }
     }
 
     @Override

@@ -27,7 +27,7 @@ import org.apache.commons.collections4.OrderedBidiMap;
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
  */
-public class AbstractOrderedBidiMapDecoratorTest<K, V>
+public abstract class AbstractOrderedBidiMapDecoratorTest<K, V>
         extends AbstractOrderedBidiMapTest<K, V> {
 
     /**
@@ -55,17 +55,18 @@ public class AbstractOrderedBidiMapDecoratorTest<K, V>
         }
     }
 
-    public AbstractOrderedBidiMapDecoratorTest(final String testName) {
-        super(testName);
-    }
-
     @Override
     public boolean isAllowNullKey() {
         return false;
     }
 
     @Override
-    public boolean isAllowNullValue() {
+    public boolean isAllowNullValueGet() {
+        return false;
+    }
+
+    @Override
+    public boolean isAllowNullValuePut() {
         return false;
     }
 

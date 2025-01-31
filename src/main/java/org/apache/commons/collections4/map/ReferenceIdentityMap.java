@@ -49,7 +49,7 @@ import java.lang.ref.Reference;
  * As a general rule, don't compare this map to other maps.
  * </p>
  * <p>
- * This {@link java.util.Map Map} implementation does <i>not</i> allow null elements.
+ * This {@link java.util.Map Map} implementation does <em>not</em> allow null elements.
  * Attempting to add a null key or value to the map will raise a {@code NullPointerException}.
  * </p>
  * <p>
@@ -72,7 +72,6 @@ import java.lang.ref.Reference;
  *
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
- *
  * @see java.lang.ref.Reference
  * @since 3.0 (previously in main package v2.1)
  */
@@ -173,6 +172,7 @@ public class ReferenceIdentityMap<K, V> extends AbstractReferenceMap<K, V> imple
      * Gets the hash code for the key specified.
      * <p>
      * This implementation uses the identity hash code.
+     * </p>
      *
      * @param key  the key to get a hash code for
      * @return the hash code
@@ -186,6 +186,7 @@ public class ReferenceIdentityMap<K, V> extends AbstractReferenceMap<K, V> imple
      * Gets the hash code for a MapEntry.
      * <p>
      * This implementation uses the identity hash code.
+     * </p>
      *
      * @param key  the key to get a hash code for, may be null
      * @param value  the value to get a hash code for, may be null
@@ -202,6 +203,7 @@ public class ReferenceIdentityMap<K, V> extends AbstractReferenceMap<K, V> imple
      * <p>
      * This implementation converts the key from the entry to a real reference
      * before comparison and uses {@code ==}.
+     * </p>
      *
      * @param key1  the first key to compare passed in from outside
      * @param key2  the second key extracted from the entry via {@code entry.key}
@@ -217,6 +219,7 @@ public class ReferenceIdentityMap<K, V> extends AbstractReferenceMap<K, V> imple
      * Compares two values for equals.
      * <p>
      * This implementation uses {@code ==}.
+     * </p>
      *
      * @param value1  the first value to compare passed in from outside
      * @param value2  the second value extracted from the entry via {@code getValue()}
@@ -228,11 +231,11 @@ public class ReferenceIdentityMap<K, V> extends AbstractReferenceMap<K, V> imple
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -240,10 +243,10 @@ public class ReferenceIdentityMap<K, V> extends AbstractReferenceMap<K, V> imple
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

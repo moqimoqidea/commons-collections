@@ -22,7 +22,6 @@ package org.apache.commons.collections4;
  *
  * @param <K> the type of the keys in the map
  * @param <V> the type of the values in the map
- *
  * @since 3.0
  */
 public interface OrderedMap<K, V> extends IterableMap<K, V> {
@@ -48,6 +47,7 @@ public interface OrderedMap<K, V> extends IterableMap<K, V> {
      * <p>
      * An ordered map iterator is an efficient way of iterating over maps
      * in both directions.
+     * </p>
      *
      * @return a map iterator
      */

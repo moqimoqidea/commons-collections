@@ -39,7 +39,6 @@ import org.apache.commons.collections4.keyvalue.AbstractMapEntryDecorator;
  *
  * @param <K> the type of the keys in the map
  * @param <V> the type of the values in the map
- *
  * @see DualHashBidiMap
  * @see DualTreeBidiMap
  * @since 3.0
@@ -110,7 +109,7 @@ public abstract class AbstractDualBidiMap<K, V> implements BidiMap<K, V> {
             if (!canRemove) {
                 throw new IllegalStateException("Iterator remove() can only be called once after next()");
             }
-            // store value as remove may change the entry in the decorator (e.g. TreeMap)
+            // store value as remove may change the entry in the decorator (for example TreeMap)
             final V value = last.getValue();
             iterator.remove();
             parent.reverseMap.remove(value);
@@ -182,7 +181,7 @@ public abstract class AbstractDualBidiMap<K, V> implements BidiMap<K, V> {
             final Object key = entry.getKey();
             if (parent.containsKey(key)) {
                 final V value = parent.normalMap.get(key);
-                if (value == null ? entry.getValue() == null : value.equals(entry.getValue())) {
+                if (Objects.equals(value, entry.getValue())) {
                     parent.normalMap.remove(key);
                     parent.reverseMap.remove(value);
                     return true;
@@ -231,7 +230,7 @@ public abstract class AbstractDualBidiMap<K, V> implements BidiMap<K, V> {
             if (!canRemove) {
                 throw new IllegalStateException("Iterator remove() can only be called once after next()");
             }
-            // store value as remove may change the entry in the decorator (e.g. TreeMap)
+            // store value as remove may change the entry in the decorator (for example TreeMap)
             final Object value = last.getValue();
             super.remove();
             parent.reverseMap.remove(value);
@@ -528,7 +527,7 @@ public abstract class AbstractDualBidiMap<K, V> implements BidiMap<K, V> {
          * This implementation iterates over the elements of this bidi map, checking each element in
          * turn to see if it's contained in {@code coll}. If it's not contained, it's removed
          * from this bidi map. As a consequence, it is advised to use a collection type for
-         * {@code coll} that provides a fast (e.g. O(1)) implementation of
+         * {@code coll} that provides a fast (for example O(1)) implementation of
          * {@link Collection#contains(Object)}.
          */
         @Override
@@ -588,7 +587,7 @@ public abstract class AbstractDualBidiMap<K, V> implements BidiMap<K, V> {
      * Creates an empty map, initialized by {@code createMap}.
      * <p>
      * This constructor remains in place for deserialization.
-     * All other usage is deprecated in favour of
+     * All other usage is deprecated in favor of
      * {@link #AbstractDualBidiMap(Map, Map)}.
      */
     protected AbstractDualBidiMap() {
@@ -697,6 +696,7 @@ public abstract class AbstractDualBidiMap<K, V> implements BidiMap<K, V> {
      * The Map Entry setValue() method only allow a new value to be set.
      * If the value being set is already in the map, an IllegalArgumentException
      * is thrown (as setValue cannot change the size of the map).
+     * </p>
      *
      * @return the entrySet view
      */
@@ -762,7 +762,6 @@ public abstract class AbstractDualBidiMap<K, V> implements BidiMap<K, V> {
      * Obtains a {@code MapIterator} over the map.
      * The iterator implements {@link BidiMapIterator}.
      * This implementation relies on the entrySet iterator.
-     * <p>
      *
      * @return a map iterator
      */

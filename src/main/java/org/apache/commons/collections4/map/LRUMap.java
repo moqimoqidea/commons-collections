@@ -66,7 +66,7 @@ import org.apache.commons.collections4.BoundedMap;
 public class LRUMap<K, V>
         extends AbstractLinkedMap<K, V> implements BoundedMap<K, V>, Serializable, Cloneable {
 
-    /** Serialisation version */
+    /** Serialization version */
     private static final long serialVersionUID = -612114643488955218L;
     /** Default maximum size */
     protected static final int DEFAULT_MAX_SIZE = 100;
@@ -193,6 +193,7 @@ public class LRUMap<K, V>
      * Constructor copying elements from another map.
      * <p>
      * The maximum size is set from the map's size.
+     * </p>
      *
      * @param map  the map to copy
      * @throws NullPointerException if the map is null
@@ -223,10 +224,12 @@ public class LRUMap<K, V>
      * <p>
      * This implementation checks the LRU size and determines whether to
      * discard an entry or not using {@link #removeLRU(AbstractLinkedMap.LinkEntry)}.
+     * </p>
      * <p>
      * From Commons Collections 3.1 this method uses {@link #isFull()} rather
      * than accessing {@code size} and {@code maxSize} directly.
      * It also handles the scanUntilRemovable functionality.
+     * </p>
      *
      * @param hashIndex  the index into the data array to store at
      * @param hashCode  the hash code of the key to add
@@ -287,7 +290,7 @@ public class LRUMap<K, V>
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     @Override
     protected void doReadObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -327,6 +330,7 @@ public class LRUMap<K, V>
      * If {@code updateToMRU} is {@code true}, the position of the key in the map
      * is changed to the most recently used position (last), otherwise the iteration
      * order is not changed by this operation.
+     * </p>
      *
      * @param key  the key
      * @param updateToMRU  whether the key shall be updated to the
@@ -380,6 +384,7 @@ public class LRUMap<K, V>
      * Moves an entry to the MRU position at the end of the list.
      * <p>
      * This implementation moves the updated entry to the end of the list.
+     * </p>
      *
      * @param entry  the entry to update
      */
@@ -405,11 +410,11 @@ public class LRUMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -421,6 +426,7 @@ public class LRUMap<K, V>
      * <p>
      * This method exists for subclasses to override. A subclass may wish to
      * provide cleanup of resources when an entry is removed. For example:
+     * </p>
      * <pre>
      * protected boolean removeLRU(LinkEntry entry) {
      *   releaseResources(entry.getValue());  // release resources held by entry
@@ -430,6 +436,7 @@ public class LRUMap<K, V>
      * <p>
      * Alternatively, a subclass may choose to not remove the entry or selectively
      * keep certain LRU entries. For example:
+     * </p>
      * <pre>
      * protected boolean removeLRU(LinkEntry entry) {
      *   if (entry.getKey().toString().startsWith("System.")) {
@@ -439,13 +446,16 @@ public class LRUMap<K, V>
      *   }
      * }
      * </pre>
+     * <p>
      * The effect of returning false is dependent on the scanUntilRemovable flag.
      * If the flag is true, the next LRU entry will be passed to this method and so on
      * until one returns false and is removed, or every entry in the map has been passed.
      * If the scanUntilRemovable flag is false, the map will exceed the maximum size.
+     * </p>
      * <p>
-     * NOTE: Commons Collections 3.0 passed the wrong entry to this method.
+     * Note: Commons Collections 3.0 passed the wrong entry to this method.
      * This is fixed in version 3.1 onwards.
+     * </p>
      *
      * @param entry  the entry to be removed
      * @return {@code true}
@@ -492,10 +502,8 @@ public class LRUMap<K, V>
             reuseEntry(entry, hashIndex, hashCode, key, value);
             addEntry(entry, hashIndex);
         } catch (final NullPointerException ex) {
-            throw new IllegalStateException(
-                    "NPE, entry=" + entry + " entryIsHeader=" + (entry==header) +
-                    " key=" + key + " value=" + value + " size=" + size + " maxSize=" + maxSize +
-                    " This should not occur if your keys are immutable, and you have used synchronization properly.");
+            throw new IllegalStateException("NPE, entry=" + entry + " entryIsHeader=" + (entry == header) + " key=" + key + " value=" + value + " size=" + size
+                    + " maxSize=" + maxSize + " This should not occur if your keys are immutable, and you have used synchronization properly.");
         }
     }
 
@@ -504,6 +512,7 @@ public class LRUMap<K, V>
      * <p>
      * This implementation moves the updated entry to the end of the list
      * using {@link #moveToMRU(AbstractLinkedMap.LinkEntry)}.
+     * </p>
      *
      * @param entry  the entry to update
      * @param newValue  the new value to store
@@ -515,10 +524,10 @@ public class LRUMap<K, V>
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

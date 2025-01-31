@@ -18,14 +18,12 @@ package org.apache.commons.collections4.iterators;
 
 /**
  * Tests the ObjectArrayListIterator class.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class ObjectArrayListIterator2Test<E> extends AbstractListIteratorTest<E> {
 
     protected String[] testArray = { "One", "Two", "Three" };
-
-    public ObjectArrayListIterator2Test() {
-        super(ObjectArrayListIterator2Test.class.getSimpleName());
-    }
 
     public ObjectArrayListIterator<E> makeArrayListIterator(final E[] array) {
         return new ObjectArrayListIterator<>(array);

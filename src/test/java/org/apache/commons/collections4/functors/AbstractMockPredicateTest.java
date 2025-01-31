@@ -55,14 +55,13 @@ public abstract class AbstractMockPredicateTest<T> {
      * Creates a single mock predicate.
      *
      * @param returnValue the return value for the mock predicate, or null if the mock is not expected to be called.
-     *
      * @return a single mock predicate.
      */
     @SuppressWarnings({"boxing"})
     protected final Predicate<T> createMockPredicate(final Boolean returnValue) {
         final Predicate<T> mockPredicate = EasyMock.createMock(Predicate.class);
         if (returnValue != null) {
-            EasyMock.expect(mockPredicate.evaluate(testValue)).andReturn(returnValue);
+            EasyMock.expect(mockPredicate.test(testValue)).andReturn(returnValue);
         }
         replay(mockPredicate);
         mockPredicatesToVerify.add(mockPredicate);

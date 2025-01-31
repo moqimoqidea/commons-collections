@@ -73,6 +73,8 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
 
     /**
      * Inner class that provides a simple reflection factory.
+     *
+     * @param <T> the type of results supplied by this supplier.
      */
     private static final class ReflectionFactory<T extends Collection<?>> implements Factory<T>, Serializable {
 
@@ -94,6 +96,13 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
             }
         }
 
+        /**
+         * Deserializes an instance from an ObjectInputStream.
+         *
+         * @param in The source ObjectInputStream.
+         * @throws IOException            Any of the usual Input/Output related exceptions.
+         * @throws ClassNotFoundException A class of a serialized object cannot be found.
+         */
         private void readObject(final ObjectInputStream is) throws IOException, ClassNotFoundException {
             is.defaultReadObject();
             // ensure that the de-serialized class is a Collection, COLLECTIONS-580
@@ -264,6 +273,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * Checks whether the map contains the value specified.
      * <p>
      * This checks all collections against all keys for the value, and thus could be slow.
+     * </p>
      *
      * @param value  the value to search for
      * @return true if the map contains the value
@@ -303,20 +313,22 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * <p>
      * This method can be overridden to perform your own processing
      * instead of using the factory.
+     * </p>
      *
      * @param size  the collection size that is about to be added
      * @return the new collection
      */
     protected Collection<V> createCollection(final int size) {
-        return collectionFactory.create();
+        return collectionFactory.get();
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * NOTE: the returned Entry objects will contain as value a {@link Collection}
+     * Note: the returned Entry objects will contain as value a {@link Collection}
      * of all values that are mapped to the given key. To get a "flattened" version
      * of all mappings contained in this map, use {@link #iterator()}.
+     * </p>
      *
      * @see #iterator()
      */
@@ -342,9 +354,11 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * <p>
      * The iterator will return multiple Entry objects with the same key
      * if there are multiple values mapped to this key.
+     * </p>
      * <p>
-     * NOTE: calling {@link java.util.Map.Entry#setValue(Object)} on any of the returned
+     * Note: calling {@link java.util.Map.Entry#setValue(Object)} on any of the returned
      * elements will result in a {@link UnsupportedOperationException}.
+     * </p>
      *
      * @return the iterator of all mappings in this map
      * @since 4.0
@@ -356,7 +370,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
         return new LazyIteratorChain<Entry<K, V>>() {
             @Override
             protected Iterator<? extends Entry<K, V>> nextIterator(final int count) {
-                if ( ! keyIterator.hasNext() ) {
+                if (!keyIterator.hasNext()) {
                     return null;
                 }
                 final K key = keyIterator.next();
@@ -365,10 +379,12 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
                     public K getKey() {
                         return key;
                     }
+
                     @Override
                     public V getValue() {
                         return input;
                     }
+
                     @Override
                     public V setValue(final V value) {
                         throw new UnsupportedOperationException();
@@ -397,6 +413,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * <p>
      * Unlike a normal {@code Map} the previous value is not replaced.
      * Instead, the new value is added to the collection stored against the key.
+     * </p>
      *
      * @param key  the key to store against
      * @param value  the value to add to the collection at the key
@@ -457,6 +474,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * added using {@code put(Object,Object)}.
      * If you call this method with a multi map, each entry is
      * added using {@code putAll(Object,Collection)}.
+     * </p>
      *
      * @param map  the map to copy (either a normal or multi map)
      */
@@ -475,11 +493,11 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      * @since 4.0
      */
     @SuppressWarnings("unchecked") // (1) should only fail if input stream is incorrect
@@ -493,9 +511,11 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * <p>
      * The item is removed from the collection mapped to the specified key.
      * Other values attached to that key are unaffected.
+     * </p>
      * <p>
      * If the last value for a key is removed, {@code null} will be returned
      * from a subsequent {@code get(key)}.
+     * </p>
      *
      * @param key  the key to remove from
      * @param value the value to remove
@@ -548,6 +568,7 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
      * Gets a collection containing all the values in the map.
      * <p>
      * This returns a collection containing the combination of values from all keys.
+     * </p>
      *
      * @return a collection view of the values contained in this map
      */
@@ -559,10 +580,10 @@ public class MultiValueMap<K, V> extends AbstractMapDecorator<K, Object> impleme
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 4.0
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

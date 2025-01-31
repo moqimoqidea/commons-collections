@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -37,25 +38,16 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("boxing")
 public class CollatingIteratorTest extends AbstractIteratorTest<Integer> {
 
-    //------------------------------------------------------------ Conventional
-
     private Comparator<Integer> comparator;
-
-    //--------------------------------------------------------------- Lifecycle
 
     private ArrayList<Integer> evens;
     private ArrayList<Integer> odds;
     private ArrayList<Integer> fib;
-    public CollatingIteratorTest() {
-        super(CollatingIteratorTest.class.getSimpleName());
-    }
 
     @Override
     public CollatingIterator<Integer> makeEmptyIterator() {
         return new CollatingIterator<>(comparator);
     }
-
-    //---------------------------------------------------- TestIterator Methods
 
     @Override
     public CollatingIterator<Integer> makeObject() {
@@ -88,8 +80,6 @@ public class CollatingIteratorTest extends AbstractIteratorTest<Integer> {
         fib.add(13);
         fib.add(21);
     }
-
-    //------------------------------------------------------------------- Tests
 
     @Test
     public void testGetSetComparator() {
@@ -224,16 +214,12 @@ public class CollatingIteratorTest extends AbstractIteratorTest<Integer> {
         final List<Integer> l2 = Arrays.asList(2, 4, 6);
 
         final CollatingIterator<Integer> collatingIterator1 = new CollatingIterator<>(null, l1.iterator(), l2.iterator());
-        try {
-            collatingIterator1.next();
-        } catch (final NullPointerException e) {
-            assertTrue(e.getMessage().startsWith("You must invoke setComparator"));
-        }
+        assertThrows(NullPointerException.class, collatingIterator1::next, "You must invoke setComparator");
 
         int i = 0;
         final CollatingIterator<Integer> collatingIterator2 = new CollatingIterator<>(null, l1.iterator(), l2.iterator());
         collatingIterator2.setComparator(new ComparableComparator<>());
-        for ( ; collatingIterator2.hasNext(); i++ ) {
+        for (; collatingIterator2.hasNext(); i++) {
             final Integer n = collatingIterator2.next();
             assertEquals((int) n, i + 1, "wrong order");
         }

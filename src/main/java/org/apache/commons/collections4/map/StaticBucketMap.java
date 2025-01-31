@@ -31,7 +31,9 @@ import org.apache.commons.collections4.KeyValue;
 /**
  * A StaticBucketMap is an efficient, thread-safe implementation of
  * {@link java.util.Map} that performs well in a highly
- * thread-contentious environment.  The map supports very efficient
+ * thread-contentious environment.
+ * <p>
+ * The map supports very efficient
  * {@link #get(Object) get}, {@link #put(Object,Object) put},
  * {@link #remove(Object) remove} and {@link #containsKey(Object) containsKey}
  * operations, assuming (approximate) uniform hashing and
@@ -39,8 +41,9 @@ import org.apache.commons.collections4.KeyValue;
  * number of entries exceeds the number of buckets or if the hash codes of the
  * objects are not uniformly distributed, these operations have a worst case
  * scenario that is proportional to the number of elements in the map
- * (<i>O(n)</i>).<p>
- *
+ * (<em>O(n)</em>).
+ * </p>
+ * <p>
  * Each bucket in the hash table has its own monitor, so two threads can
  * safely operate on the map at the same time, often without incurring any
  * monitor contention.  This means that you don't have to wrap instances
@@ -49,8 +52,9 @@ import org.apache.commons.collections4.KeyValue;
  * that this map implementation behaves in ways you may find disconcerting.
  * Bulk operations, such as {@link #putAll(Map) putAll} or the
  * {@link Collection#retainAll(Collection) retainAll} operation in collection
- * views, are <i>not</i> atomic.  If two threads are simultaneously
+ * views, are <em>not</em> atomic.  If two threads are simultaneously
  * executing
+ * </p>
  *
  * <pre>
  *   staticBucketMapInstance.putAll(map);
@@ -62,34 +66,41 @@ import org.apache.commons.collections4.KeyValue;
  *   staticBucketMapInstance.entrySet().removeAll(map.entrySet());
  * </pre>
  *
+ * <p>
  * then the results are generally random.  Those two statement could cancel
  * each other out, leaving {@code staticBucketMapInstance} essentially
  * unchanged, or they could leave some random subset of {@code map} in
- * {@code staticBucketMapInstance}.<p>
- *
+ * {@code staticBucketMapInstance}.
+ * </p>
+ * <p>
  * Also, much like an encyclopedia, the results of {@link #size()} and
- * {@link #isEmpty()} are out-of-date as soon as they are produced.<p>
- *
- * The iterators returned by the collection views of this class are <i>not</i>
- * fail-fast.  They will <i>never</i> raise a
+ * {@link #isEmpty()} are out-of-date as soon as they are produced.
+ * </p>
+ * <p>
+ * The iterators returned by the collection views of this class are <em>not</em>
+ * fail-fast.  They will <em>never</em> raise a
  * {@link java.util.ConcurrentModificationException}.  Keys and values
  * added to the map after the iterator is created do not necessarily appear
  * during iteration.  Similarly, the iterator does not necessarily fail to
- * return keys and values that were removed after the iterator was created.<p>
- *
+ * return keys and values that were removed after the iterator was created.
+ * </p>
+ * <p>
  * Finally, unlike {@link java.util.HashMap}-style implementations, this
- * class <i>never</i> rehashes the map.  The number of buckets is fixed
+ * class <em>never</em> rehashes the map.  The number of buckets is fixed
  * at construction time and never altered.  Performance may degrade if
- * you do not allocate enough buckets upfront.<p>
- *
+ * you do not allocate enough buckets upfront.
+ * </p>
+ * <p>
  * The {@link #atomic(Runnable)} method is provided to allow atomic iterations
  * and bulk operations; however, overuse of {@link #atomic(Runnable) atomic}
  * will basically result in a map that's slower than an ordinary synchronized
  * {@link java.util.HashMap}.
- *
+ * </p>
+ * <p>
  * Use this class if you do not require reliable bulk operations and
  * iterations, or if you can make your own guarantees about how bulk
- * operations will affect the map.<p>
+ * operations will affect the map.
+ * </p>
  *
  * @param <K> the type of the keys in this map
  * @param <V> the type of the values in this map
@@ -138,6 +149,7 @@ public final class StaticBucketMap<K, V> extends AbstractIterableMap<K, V> {
             last = null;
         }
     }
+
     private final class EntryIterator extends BaseIterator implements Iterator<Map.Entry<K, V>> {
 
         @Override
@@ -146,6 +158,7 @@ public final class StaticBucketMap<K, V> extends AbstractIterableMap<K, V> {
         }
 
     }
+
     private final class EntrySet extends AbstractSet<Map.Entry<K, V>> {
 
         @Override
@@ -270,8 +283,8 @@ public final class StaticBucketMap<K, V> extends AbstractIterableMap<K, V> {
             }
 
             final Map.Entry<?, ?> e2 = (Map.Entry<?, ?>) obj;
-            return (key == null ? e2.getKey() == null : key.equals(e2.getKey())) &&
-                (value == null ? e2.getValue() == null : value.equals(e2.getValue()));
+            return Objects.equals(key, e2.getKey()) &&
+                   Objects.equals(value, e2.getValue());
         }
 
         @Override
@@ -291,10 +304,10 @@ public final class StaticBucketMap<K, V> extends AbstractIterableMap<K, V> {
         }
 
         @Override
-        public V setValue(final V obj) {
-            final V retVal = value;
-            value = obj;
-            return retVal;
+        public V setValue(final V value) {
+            final V old = this.value;
+            this.value = value;
+            return old;
         }
     }
 
@@ -370,21 +383,20 @@ public final class StaticBucketMap<K, V> extends AbstractIterableMap<K, V> {
     }
 
     /**
-     *  Prevents any operations from occurring on this map while the
-     *  given {@link Runnable} executes.  This method can be used, for
-     *  instance, to execute a bulk operation atomically:
+     * Prevents any operations from occurring on this map while the given {@link Runnable} executes. This method can be used, for instance, to execute a bulk
+     * operation atomically:
+     * <pre>
+     * staticBucketMapInstance.atomic(new Runnable() {
+     *     public void run() {
+     *         staticBucketMapInstance.putAll(map);
+     *     }
+     * });
+     * </pre>
+     * <p>
+     * It can also be used if you need a reliable iterator:
+     * </p>
      *
-     *  <pre>
-     *    staticBucketMapInstance.atomic(new Runnable() {
-     *        public void run() {
-     *            staticBucketMapInstance.putAll(map);
-     *        }
-     *    });
-     *  </pre>
-     *
-     *  It can also be used if you need a reliable iterator:
-     *
-     *  <pre>
+     * <pre>
      *    staticBucketMapInstance.atomic(new Runnable() {
      *        public void run() {
      *            Iterator iterator = staticBucketMapInstance.iterator();
@@ -393,15 +405,13 @@ public final class StaticBucketMap<K, V> extends AbstractIterableMap<K, V> {
      *            }
      *        }
      *    });
-     *  </pre>
+     * </pre>
+     * <p>
+     * <strong>Implementation note:</strong> This method requires a lot of time and a ton of stack space. Essentially a recursive algorithm is used to enter each bucket's
+     * monitor. If you have twenty thousand buckets in your map, then the recursive method will be invoked twenty thousand times. You have been warned.
+     * </p>
      *
-     *  <b>Implementation note:</b> This method requires a lot of time
-     *  and a ton of stack space.  Essentially a recursive algorithm is used
-     *  to enter each bucket's monitor.  If you have twenty thousand buckets
-     *  in your map, then the recursive method will be invoked twenty thousand
-     *  times.  You have been warned.
-     *
-     *  @param runnable  the code to execute atomically
+     * @param runnable the code to execute atomically
      */
     public void atomic(final Runnable runnable) {
         atomic(Objects.requireNonNull(runnable, "runnable"), 0);
@@ -650,7 +660,7 @@ public final class StaticBucketMap<K, V> extends AbstractIterableMap<K, V> {
 
     /**
      * Puts all the entries from the specified map into this map.
-     * This operation is <b>not atomic</b> and may have undesired effects.
+     * This operation is <strong>not atomic</strong> and may have undesired effects.
      *
      * @param map  the map of entries to add
      */

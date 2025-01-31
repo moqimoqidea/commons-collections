@@ -25,16 +25,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link CaseInsensitiveMap} implementation.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class CaseInsensitiveMapTest<K, V> extends AbstractIterableMapTest<K, V> {
-
-    public CaseInsensitiveMapTest() {
-        super(CaseInsensitiveMapTest.class.getSimpleName());
-    }
 
     @Override
     public String getCompatibilityVersion() {
@@ -82,7 +82,7 @@ public class CaseInsensitiveMapTest<K, V> extends AbstractIterableMapTest<K, V> 
     public void testLocaleIndependence() {
         final Locale orig = Locale.getDefault();
 
-        final Locale[] locales = { Locale.ENGLISH, new Locale("tr", "", ""), Locale.getDefault() };
+        final Locale[] locales = { Locale.ENGLISH, new Locale("tr", StringUtils.EMPTY, StringUtils.EMPTY), Locale.getDefault() };
 
         final String[][] data = {
             { "i", "I" },

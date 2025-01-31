@@ -72,12 +72,12 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
 
             @Override
             public boolean contains(final Object o) {
-                return decoratedMap.entrySet().contains(o);
+                return map.entrySet().contains(o);
             }
 
             @Override
             public Iterator<Map.Entry<K, Collection<V>>> iterator() {
-                return new AsMapEntrySetIterator(decoratedMap.entrySet().iterator());
+                return new AsMapEntrySetIterator(map.entrySet().iterator());
             }
 
             @Override
@@ -113,10 +113,10 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
             }
         }
 
-        final transient Map<K, Collection<V>> decoratedMap;
+        final transient Map<K, Collection<V>> map;
 
         AsMap(final Map<K, Collection<V>> map) {
-            this.decoratedMap = map;
+            this.map = map;
         }
 
         @Override
@@ -126,7 +126,7 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
 
         @Override
         public boolean containsKey(final Object key) {
-            return decoratedMap.containsKey(key);
+            return map.containsKey(key);
         }
 
         @Override
@@ -136,12 +136,12 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
 
         @Override
         public boolean equals(final Object object) {
-            return this == object || decoratedMap.equals(object);
+            return this == object || map.equals(object);
         }
 
         @Override
         public Collection<V> get(final Object key) {
-            final Collection<V> collection = decoratedMap.get(key);
+            final Collection<V> collection = map.get(key);
             if (collection == null) {
                 return null;
             }
@@ -152,7 +152,7 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
 
         @Override
         public int hashCode() {
-            return decoratedMap.hashCode();
+            return map.hashCode();
         }
 
         @Override
@@ -162,7 +162,7 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
 
         @Override
         public Collection<V> remove(final Object key) {
-            final Collection<V> collection = decoratedMap.remove(key);
+            final Collection<V> collection = map.remove(key);
             if (collection == null) {
                 return null;
             }
@@ -175,12 +175,12 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
 
         @Override
         public int size() {
-            return decoratedMap.size();
+            return map.size();
         }
 
         @Override
         public String toString() {
-            return decoratedMap.toString();
+            return map.toString();
         }
     }
 
@@ -220,11 +220,12 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
      */
     private final class KeysMultiSet extends AbstractMultiSet<K> {
 
-        private final class MapEntryTransformer
-            implements Transformer<Map.Entry<K, Collection<V>>, MultiSet.Entry<K>> {
+        private final class MapEntryTransformer implements Transformer<Map.Entry<K, Collection<V>>, MultiSet.Entry<K>> {
+
             @Override
             public MultiSet.Entry<K> transform(final Map.Entry<K, Collection<V>> mapEntry) {
                 return new AbstractMultiSet.AbstractEntry<K>() {
+
                     @Override
                     public int getCount() {
                         return mapEntry.getValue().size();
@@ -575,7 +576,7 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
     private transient Map<K, Collection<V>> map;
 
     /**
-     * Constructor needed for subclass serialisation.
+     * Constructor needed for subclass serialization.
      */
     protected AbstractMultiValuedMap() {
     }
@@ -617,13 +618,18 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
         return values().contains(value);
     }
 
+    /**
+     * Creates a new Collection typed for a given subclass.
+     *
+     * @return a new Collection typed for a given subclass.
+     */
     protected abstract Collection<V> createCollection();
 
     /**
      * Read the map in using a custom routine.
      * @param in the input stream
      * @throws IOException any of the usual I/O related exceptions
-     * @throws ClassNotFoundException if the stream contains an object which class can not be loaded
+     * @throws ClassNotFoundException if the stream contains an object which class cannot be loaded
      * @throws ClassCastException if the stream does not contain the correct objects
      */
     protected void doReadObject(final ObjectInputStream in)
@@ -867,7 +873,7 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
     /**
      * Sets the map being wrapped.
      * <p>
-     * <b>NOTE:</b> this method should only be used during deserialization
+     * <strong>NOTE:</strong> this method should only be used during deserialization
      *
      * @param map the map to wrap
      */
@@ -879,7 +885,7 @@ public abstract class AbstractMultiValuedMap<K, V> implements MultiValuedMap<K, 
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation does <b>not</b> cache the total size
+     * This implementation does <strong>not</strong> cache the total size
      * of the multivalued map, but rather calculates it by iterating
      * over the entries of the underlying map.
      */

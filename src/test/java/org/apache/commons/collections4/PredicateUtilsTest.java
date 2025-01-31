@@ -16,14 +16,13 @@
  */
 package org.apache.commons.collections4;
 
-import static org.apache.commons.collections4.functors.NullPredicate.nullPredicate;
-import static org.apache.commons.collections4.functors.TruePredicate.truePredicate;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,16 +49,16 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Override
     protected Predicate<?> generatePredicate() {
-        return truePredicate();  //Just return something to satisfy super class.
+        return TruePredicate.truePredicate();  //Just return something to satisfy super class.
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void testAllPredicate() {
         assertPredicateTrue(AllPredicate.allPredicate(), null);
-        assertTrue(AllPredicate.allPredicate(truePredicate(), truePredicate(), truePredicate()).evaluate(null));
-        assertFalse(AllPredicate.allPredicate(truePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
-        assertFalse(AllPredicate.allPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertTrue(AllPredicate.allPredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate(), TruePredicate.truePredicate()).test(null));
+        assertFalse(AllPredicate.allPredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).test(null));
+        assertFalse(AllPredicate.allPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).test(null));
         assertFalse(AllPredicate.allPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
         final Collection<Predicate<Object>> coll = new ArrayList<>();
         coll.add(TruePredicate.truePredicate());
@@ -127,9 +126,9 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testAndPredicate() {
-        assertTrue(PredicateUtils.andPredicate(truePredicate(), truePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.andPredicate(truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.andPredicate(FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.andPredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.andPredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.andPredicate(FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
         assertFalse(PredicateUtils.andPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
     }
 
@@ -143,9 +142,9 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
     public void testAnyPredicate() {
         assertPredicateFalse(PredicateUtils.anyPredicate(), null);
 
-        assertTrue(PredicateUtils.anyPredicate(truePredicate(), truePredicate(), truePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.anyPredicate(truePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.anyPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.anyPredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.anyPredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.anyPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
         assertFalse(PredicateUtils.anyPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
         final Collection<Predicate<Object>> coll = new ArrayList<>();
         coll.add(TruePredicate.truePredicate());
@@ -229,9 +228,9 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testEitherPredicate() {
-        assertFalse(PredicateUtils.eitherPredicate(truePredicate(), truePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.eitherPredicate(truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.eitherPredicate(FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.eitherPredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.eitherPredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.eitherPredicate(FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
         assertFalse(PredicateUtils.eitherPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
     }
 
@@ -262,7 +261,7 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testIdentityPredicate() {
-        assertSame(nullPredicate(), PredicateUtils.identityPredicate(null));
+        assertSame(NullPredicate.nullPredicate(), PredicateUtils.identityPredicate(null));
         assertNotNull(PredicateUtils.identityPredicate(6));
         assertFalse(PredicateUtils.identityPredicate(6).evaluate(null));
         assertFalse(PredicateUtils.<Object>identityPredicate(6).evaluate(cObject));
@@ -342,9 +341,9 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testNeitherPredicate() {
-        assertFalse(PredicateUtils.neitherPredicate(truePredicate(), truePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.neitherPredicate(truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.neitherPredicate(FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.neitherPredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.neitherPredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.neitherPredicate(FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
         assertTrue(PredicateUtils.neitherPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
     }
 
@@ -357,9 +356,9 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
     @SuppressWarnings("unchecked")
     public void testNonePredicate() {
         assertPredicateTrue(PredicateUtils.nonePredicate(), null);
-        assertFalse(PredicateUtils.nonePredicate(truePredicate(), truePredicate(), truePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.nonePredicate(truePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.nonePredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.nonePredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.nonePredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.nonePredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
         assertTrue(PredicateUtils.nonePredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
         final Collection<Predicate<Object>> coll = new ArrayList<>();
         coll.add(TruePredicate.truePredicate());
@@ -429,10 +428,10 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
     @Test
     public void testNotPredicate() {
         assertNotNull(PredicateUtils.notPredicate(TruePredicate.truePredicate()));
-        assertFalse(PredicateUtils.notPredicate(truePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.notPredicate(truePredicate()).evaluate(cObject));
-        assertFalse(PredicateUtils.notPredicate(truePredicate()).evaluate(cString));
-        assertFalse(PredicateUtils.notPredicate(truePredicate()).evaluate(cInteger));
+        assertFalse(PredicateUtils.notPredicate(TruePredicate.truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.notPredicate(TruePredicate.truePredicate()).evaluate(cObject));
+        assertFalse(PredicateUtils.notPredicate(TruePredicate.truePredicate()).evaluate(cString));
+        assertFalse(PredicateUtils.notPredicate(TruePredicate.truePredicate()).evaluate(cInteger));
     }
 
     @Test
@@ -442,7 +441,7 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testNullIsExceptionPredicate() {
-        assertTrue(PredicateUtils.nullIsExceptionPredicate(truePredicate()).evaluate(new Object()));
+        assertTrue(PredicateUtils.nullIsExceptionPredicate(TruePredicate.truePredicate()).evaluate(new Object()));
         assertThrows(FunctorException.class, () -> PredicateUtils.nullIsExceptionPredicate(TruePredicate.truePredicate()).evaluate(null));
     }
 
@@ -453,8 +452,8 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testNullIsFalsePredicate() {
-        assertFalse(PredicateUtils.nullIsFalsePredicate(truePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.nullIsFalsePredicate(truePredicate()).evaluate(new Object()));
+        assertFalse(PredicateUtils.nullIsFalsePredicate(TruePredicate.truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.nullIsFalsePredicate(TruePredicate.truePredicate()).evaluate(new Object()));
         assertFalse(PredicateUtils.nullIsFalsePredicate(FalsePredicate.falsePredicate()).evaluate(new Object()));
     }
 
@@ -465,8 +464,8 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testNullIsTruePredicate() {
-        assertTrue(PredicateUtils.nullIsTruePredicate(truePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.nullIsTruePredicate(truePredicate()).evaluate(new Object()));
+        assertTrue(PredicateUtils.nullIsTruePredicate(TruePredicate.truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.nullIsTruePredicate(TruePredicate.truePredicate()).evaluate(new Object()));
         assertFalse(PredicateUtils.nullIsTruePredicate(FalsePredicate.falsePredicate()).evaluate(new Object()));
     }
 
@@ -479,11 +478,11 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
     @SuppressWarnings("unchecked")
     public void testOnePredicate() {
         assertPredicateFalse(PredicateUtils.onePredicate((Predicate<Object>[]) new Predicate[] {}), null);
-        assertFalse(PredicateUtils.onePredicate(truePredicate(), truePredicate(), truePredicate()).evaluate(null));
-        assertFalse(PredicateUtils.onePredicate(truePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.onePredicate(truePredicate(), FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.onePredicate(FalsePredicate.falsePredicate(), truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.onePredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.onePredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertFalse(PredicateUtils.onePredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.onePredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.onePredicate(FalsePredicate.falsePredicate(), TruePredicate.truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.onePredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
         assertFalse(PredicateUtils.onePredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
         final Collection<Predicate<Object>> coll = new ArrayList<>();
         coll.add(TruePredicate.truePredicate());
@@ -549,9 +548,9 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
 
     @Test
     public void testOrPredicate() {
-        assertTrue(PredicateUtils.orPredicate(truePredicate(), truePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.orPredicate(truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
-        assertTrue(PredicateUtils.orPredicate(FalsePredicate.falsePredicate(), truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.orPredicate(TruePredicate.truePredicate(), TruePredicate.truePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.orPredicate(TruePredicate.truePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
+        assertTrue(PredicateUtils.orPredicate(FalsePredicate.falsePredicate(), TruePredicate.truePredicate()).evaluate(null));
         assertFalse(PredicateUtils.orPredicate(FalsePredicate.falsePredicate(), FalsePredicate.falsePredicate()).evaluate(null));
     }
 
@@ -565,7 +564,7 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
      * serialization/deserialization process.
      */
     @Test
-    public void testSingletonPatternInSerialization() {
+    public void testSingletonPatternInSerialization() throws ClassNotFoundException, IOException {
         final Object[] singletons = {
             ExceptionPredicate.INSTANCE,
             FalsePredicate.INSTANCE,
@@ -586,7 +585,7 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
     public void testTransformedPredicate() {
         assertTrue(PredicateUtils.transformedPredicate(
                 TransformerUtils.nopTransformer(),
-                truePredicate()).evaluate(new Object()));
+                TruePredicate.truePredicate()).evaluate(new Object()));
 
         final Map<Object, Object> map = new HashMap<>();
         map.put(Boolean.TRUE, "Hello");
@@ -602,10 +601,10 @@ public class PredicateUtilsTest extends AbstractPredicateTest {
     public void testTruePredicate() {
         assertNotNull(TruePredicate.truePredicate());
         assertSame(TruePredicate.truePredicate(), TruePredicate.truePredicate());
-        assertTrue(truePredicate().evaluate(null));
-        assertTrue(truePredicate().evaluate(cObject));
-        assertTrue(truePredicate().evaluate(cString));
-        assertTrue(truePredicate().evaluate(cInteger));
+        assertTrue(TruePredicate.truePredicate().evaluate(null));
+        assertTrue(TruePredicate.truePredicate().evaluate(cObject));
+        assertTrue(TruePredicate.truePredicate().evaluate(cString));
+        assertTrue(TruePredicate.truePredicate().evaluate(cInteger));
     }
 
     @Test

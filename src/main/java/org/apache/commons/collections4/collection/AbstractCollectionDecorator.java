@@ -153,12 +153,12 @@ public abstract class AbstractCollectionDecorator<E>
     /**
      * Sets the collection being decorated.
      * <p>
-     * <b>NOTE:</b> this method should only be used during deserialization
+     * <strong>NOTE:</strong> this method should only be used during deserialization
      *
-     * @param coll  the decorated collection
+     * @param collection  the decorated collection
      */
-    protected void setCollection(final Collection<E> coll) {
-        this.collection = coll;
+    protected void setCollection(final Collection<E> collection) {
+        this.collection = collection;
     }
 
     @Override

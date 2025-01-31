@@ -35,6 +35,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for ReferenceIdentityMap.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class ReferenceIdentityMapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
@@ -57,10 +60,6 @@ public class ReferenceIdentityMapTest<K, V> extends AbstractIterableMapTest<K, V
     WeakReference<K> keyReference;
 
     WeakReference<V> valueReference;
-
-    public ReferenceIdentityMapTest() {
-        super(ReferenceIdentityMapTest.class.getSimpleName());
-    }
 
     @SuppressWarnings("unchecked")
     private Map<K, V> buildRefMap() {
@@ -101,7 +100,12 @@ public class ReferenceIdentityMapTest<K, V> extends AbstractIterableMapTest<K, V
     }
 
     @Override
-    public boolean isAllowNullValue() {
+    public boolean isAllowNullValueGet() {
+        return true;
+    }
+
+    @Override
+    public boolean isAllowNullValuePut() {
         return false;
     }
 

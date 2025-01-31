@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import org.apache.commons.collections4.functors.FalsePredicate;
 import org.apache.commons.collections4.functors.NOPTransformer;
 import org.apache.commons.collections4.functors.StringValueTransformer;
 import org.apache.commons.collections4.functors.TruePredicate;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -54,7 +56,9 @@ public class TransformerUtilsTest {
     public void testChainedTransformer() {
         final Transformer<Object, Object> a = TransformerUtils.<Object, Object>constantTransformer("A");
         final Transformer<Object, Object> b = TransformerUtils.constantTransformer((Object) "B");
-
+        assertEquals("A", TransformerUtils.chainedTransformer(b, a).apply(null));
+        assertEquals("B", TransformerUtils.chainedTransformer(a, b).apply(null));
+        assertEquals("A", TransformerUtils.chainedTransformer(b, a).apply(null));
         assertEquals("A", TransformerUtils.chainedTransformer(b, a).transform(null));
         assertEquals("B", TransformerUtils.chainedTransformer(a, b).transform(null));
         assertEquals("A", TransformerUtils.chainedTransformer(b, a).transform(null));
@@ -166,7 +170,7 @@ public class TransformerUtilsTest {
         assertThrows(FunctorException.class, () -> finalTrans.transform(String.class));
 
         trans = TransformerUtils.instantiateTransformer();
-        assertEquals("", trans.transform(String.class));
+        assertEquals(StringUtils.EMPTY, trans.transform(String.class));
 
         trans = TransformerUtils.instantiateTransformer(new Class[] { Long.TYPE }, new Object[] {1000L});
         assertEquals(new Date(1000L), trans.transform(Date.class));
@@ -254,7 +258,7 @@ public class TransformerUtilsTest {
      * serialization/deserialization process.
      */
     @Test
-    public void testSingletonPatternInSerialization() {
+    public void testSingletonPatternInSerialization() throws ClassNotFoundException, IOException {
         final Object[] singletons = {
             ExceptionTransformer.INSTANCE,
             NOPTransformer.INSTANCE,
@@ -268,12 +272,10 @@ public class TransformerUtilsTest {
 
     @Test
     public void testStringValueTransformer() {
-        assertNotNull( "StringValueTransformer should NEVER return a null value.",
-            TransformerUtils.stringValueTransformer().transform(null));
-        assertEquals( "null",
-            TransformerUtils.stringValueTransformer().transform(null), "StringValueTransformer should return \"null\" when given a null argument.");
-        assertEquals( "6",
-            TransformerUtils.stringValueTransformer().transform(6), "StringValueTransformer should return toString value");
+        assertNotNull("StringValueTransformer should NEVER return a null value.", TransformerUtils.stringValueTransformer().transform(null));
+        assertEquals("null", TransformerUtils.stringValueTransformer().transform(null),
+                "StringValueTransformer should return \"null\" when given a null argument.");
+        assertEquals("6", TransformerUtils.stringValueTransformer().transform(6), "StringValueTransformer should return toString value");
     }
 
     @Test

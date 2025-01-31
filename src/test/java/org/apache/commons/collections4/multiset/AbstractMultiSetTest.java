@@ -63,9 +63,6 @@ import org.junit.jupiter.api.Test;
 public abstract class AbstractMultiSetTest<T> extends AbstractCollectionTest<T> {
 
     public class TestMultiSetUniqueSet extends AbstractSetTest<T> {
-        public TestMultiSetUniqueSet() {
-            super("");
-        }
 
         @Override
         public T[] getFullElements() {
@@ -133,15 +130,6 @@ public abstract class AbstractMultiSetTest<T> extends AbstractCollectionTest<T> 
     }
 
     /**
-     * JUnit constructor.
-     *
-     * @param testName  the test class name
-     */
-    public AbstractMultiSetTest(final String testName) {
-        super(testName);
-    }
-
-    /**
      * Bulk test {@link MultiSet#uniqueSet()}.  This method runs through all of
      * the tests in {@link AbstractSetTest}.
      * After modification operations, {@link #verify()} is invoked to ensure
@@ -168,8 +156,7 @@ public abstract class AbstractMultiSetTest<T> extends AbstractCollectionTest<T> 
      */
     @Override
     public Collection<T> makeConfirmedCollection() {
-        final ArrayList<T> list = new ArrayList<>();
-        return list;
+        return new ArrayList<>();
     }
 
     /**
@@ -202,14 +189,14 @@ public abstract class AbstractMultiSetTest<T> extends AbstractCollectionTest<T> 
 
     @Override
     public void resetEmpty() {
-        this.setCollection(makeObject());
-        this.setConfirmed(makeConfirmedCollection());
+        setCollection(makeObject());
+        setConfirmed(makeConfirmedCollection());
     }
 
     @Override
     public void resetFull() {
-        this.setCollection(makeFullCollection());
-        this.setConfirmed(makeConfirmedFullCollection());
+        setCollection(makeFullCollection());
+        setConfirmed(makeConfirmedFullCollection());
     }
 
     /**

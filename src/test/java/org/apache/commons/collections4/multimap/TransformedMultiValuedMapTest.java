@@ -31,13 +31,9 @@ import org.apache.commons.collections4.collection.TransformedCollectionTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for TransformedMultiValuedMap
+ * Tests {@link TransformedMultiValuedMap}.
  */
 public class TransformedMultiValuedMapTest<K, V> extends AbstractMultiValuedMapTest<K, V> {
-
-    public TransformedMultiValuedMapTest() {
-        super(TransformedMultiValuedMapTest.class.getSimpleName());
-    }
 
     @Override
     protected int getIterationBehaviour() {

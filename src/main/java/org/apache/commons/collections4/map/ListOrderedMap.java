@@ -97,7 +97,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public void clear() {
-            this.parent.clear();
+            parent.clear();
         }
 
         @Override
@@ -131,7 +131,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public boolean isEmpty() {
-            return this.parent.isEmpty();
+            return parent.isEmpty();
         }
 
         @Override
@@ -155,7 +155,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public int size() {
-            return this.parent.size();
+            return parent.size();
         }
 
         @Override
@@ -174,12 +174,12 @@ public class ListOrderedMap<K, V>
 
         @Override
         public void clear() {
-            this.parent.clear();
+            parent.clear();
         }
 
         @Override
         public boolean contains(final Object value) {
-            return this.parent.containsKey(value);
+            return parent.containsKey(value);
         }
 
         @Override
@@ -194,7 +194,7 @@ public class ListOrderedMap<K, V>
 
         @Override
         public int size() {
-            return this.parent.size();
+            return parent.size();
         }
     }
 
@@ -334,17 +334,17 @@ public class ListOrderedMap<K, V>
 
         @Override
         public void clear() {
-            this.parent.clear();
+            parent.clear();
         }
 
         @Override
         public boolean contains(final Object value) {
-            return this.parent.containsValue(value);
+            return parent.containsValue(value);
         }
 
         @Override
         public V get(final int index) {
-            return this.parent.getValue(index);
+            return parent.getValue(index);
         }
 
         @Override
@@ -359,17 +359,17 @@ public class ListOrderedMap<K, V>
 
         @Override
         public V remove(final int index) {
-            return this.parent.remove(index);
+            return parent.remove(index);
         }
 
         @Override
         public V set(final int index, final V value) {
-            return this.parent.setValue(index, value);
+            return parent.setValue(index, value);
         }
 
         @Override
         public int size() {
-            return this.parent.size();
+            return parent.size();
         }
     }
 
@@ -380,6 +380,7 @@ public class ListOrderedMap<K, V>
      * Factory method to create an ordered map.
      * <p>
      * An {@code ArrayList} is used to retain order.
+     * </p>
      *
      * @param <K>  the key type
      * @param <V>  the value type
@@ -425,9 +426,11 @@ public class ListOrderedMap<K, V>
      * the end of the list, which is an unexpected side effect of changing the
      * value of a list.  This occurs because changing the key, changes when the
      * mapping is added to the map and thus where it appears in the list.
+     * </p>
      * <p>
      * An alternative to this method is to use the better named
      * {@link #keyList()} or {@link #keySet()}.
+     * </p>
      *
      * @see #keyList()
      * @see #keySet()
@@ -447,12 +450,13 @@ public class ListOrderedMap<K, V>
      * Gets a view over the entries in the map.
      * <p>
      * The Set will be ordered by object insertion into the map.
+     * </p>
      *
      * @return the fully modifiable set view over the entries
      */
     @Override
     public Set<Map.Entry<K, V>> entrySet() {
-        return new EntrySetView<>(this, this.insertOrder);
+        return new EntrySetView<>(this, insertOrder);
     }
 
     /**
@@ -506,6 +510,7 @@ public class ListOrderedMap<K, V>
      * <p>
      * The List will be ordered by object insertion into the map.
      * The List is unmodifiable.
+     * </p>
      *
      * @see #keySet()
      * @return the unmodifiable list view over the keys
@@ -519,6 +524,7 @@ public class ListOrderedMap<K, V>
      * Gets a view over the keys in the map.
      * <p>
      * The Collection will be ordered by object insertion into the map.
+     * </p>
      *
      * @see #keyList()
      * @return the fully modifiable collection view over the keys
@@ -542,7 +548,6 @@ public class ListOrderedMap<K, V>
         return insertOrder.get(size() - 1);
     }
 
-    // Implement OrderedMap
     @Override
     public OrderedMapIterator<K, V> mapIterator() {
         return new ListOrderedMapIterator<>(this);
@@ -587,10 +592,12 @@ public class ListOrderedMap<K, V>
      * is removed and the new mapping added at the specified index.
      * The remove may change the effect of the index. The index is
      * always calculated relative to the original state of the map.
+     * </p>
      * <p>
      * Thus, the steps are: (1) remove the existing key-value mapping,
      * then (2) insert the new key-value mapping at the position it
      * would have been inserted had the remove not occurred.
+     * </p>
      *
      * @param index  the index at which the mapping should be inserted
      * @param key  the key
@@ -669,11 +676,11 @@ public class ListOrderedMap<K, V>
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in  the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      * @since 3.1
      */
     @SuppressWarnings("unchecked") // (1) should only fail if input stream is incorrect
@@ -751,6 +758,7 @@ public class ListOrderedMap<K, V>
      * <p>
      * The List will be ordered by object insertion into the map.
      * The List supports remove and set, but does not support add.
+     * </p>
      *
      * @see #values()
      * @return the partially modifiable list view over the values
@@ -764,9 +772,11 @@ public class ListOrderedMap<K, V>
      * Gets a view over the values in the map.
      * <p>
      * The Collection will be ordered by object insertion into the map.
+     * </p>
      * <p>
      * From Commons Collections 3.2, this Collection can be cast
      * to a list, see {@link #valueList()}
+     * </p>
      *
      * @see #valueList()
      * @return the fully modifiable collection view over the values
@@ -777,10 +787,10 @@ public class ListOrderedMap<K, V>
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      * @since 3.1
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {

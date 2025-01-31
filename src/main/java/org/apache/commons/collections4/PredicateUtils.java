@@ -64,7 +64,9 @@ import org.apache.commons.collections4.functors.UniquePredicate;
  * <li>NullIsException/NullIsFalse/NullIsTrue - check for null input
  * <li>Transformed - transforms the input before calling the predicate
  * </ul>
+ * <p>
  * All the supplied predicates are Serializable.
+ * </p>
  *
  * @since 3.0
  */
@@ -179,7 +181,7 @@ public class PredicateUtils {
     public static <T> Predicate<T> eitherPredicate(final Predicate<? super T> predicate1,
                                                    final Predicate<? super T> predicate2) {
         @SuppressWarnings("unchecked")
-        final Predicate<T> onePredicate = PredicateUtils.onePredicate(predicate1, predicate2);
+        final Predicate<T> onePredicate = onePredicate(predicate1, predicate2);
         return onePredicate;
     }
 
@@ -252,7 +254,7 @@ public class PredicateUtils {
      * and have no parameters. If the input object is null, a
      * PredicateException is thrown.
      * <p>
-     * For example, {@code PredicateUtils.invokerPredicate("isEmpty");}
+     * For ePredicateUtils.invokerPredicate("isEmpty");}
      * will call the {@code isEmpty} method on the input object to
      * determine the predicate result.
      *
@@ -277,6 +279,7 @@ public class PredicateUtils {
      * For example, {@code PredicateUtils.invokerPredicate("isEmpty");}
      * will call the {@code isEmpty} method on the input object to
      * determine the predicate result.
+     * </p>
      *
      * @param <T>  the type that the predicate queries
      * @param methodName  the method name to call on the input object, may not be null
@@ -308,7 +311,7 @@ public class PredicateUtils {
     public static <T> Predicate<T> neitherPredicate(final Predicate<? super T> predicate1,
                                                     final Predicate<? super T> predicate2) {
         @SuppressWarnings("unchecked")
-        final Predicate<T> nonePredicate = PredicateUtils.nonePredicate(predicate1, predicate2);
+        final Predicate<T> nonePredicate = nonePredicate(predicate1, predicate2);
         return nonePredicate;
     }
 
@@ -380,7 +383,7 @@ public class PredicateUtils {
      * @throws NullPointerException if the predicate is null.
      * @see NullIsExceptionPredicate
      */
-    public static <T> Predicate<T> nullIsExceptionPredicate(final Predicate<? super T> predicate){
+    public static <T> Predicate<T> nullIsExceptionPredicate(final Predicate<? super T> predicate) {
         return NullIsExceptionPredicate.nullIsExceptionPredicate(predicate);
     }
 
@@ -395,7 +398,7 @@ public class PredicateUtils {
      * @throws NullPointerException if the predicate is null.
      * @see NullIsFalsePredicate
      */
-    public static <T> Predicate<T> nullIsFalsePredicate(final Predicate<? super T> predicate){
+    public static <T> Predicate<T> nullIsFalsePredicate(final Predicate<? super T> predicate) {
         return NullIsFalsePredicate.nullIsFalsePredicate(predicate);
     }
 
@@ -410,7 +413,7 @@ public class PredicateUtils {
      * @throws NullPointerException if the predicate is null.
      * @see NullIsTruePredicate
      */
-    public static <T> Predicate<T> nullIsTruePredicate(final Predicate<? super T> predicate){
+    public static <T> Predicate<T> nullIsTruePredicate(final Predicate<? super T> predicate) {
         return NullIsTruePredicate.nullIsTruePredicate(predicate);
     }
 
@@ -473,7 +476,6 @@ public class PredicateUtils {
         return OrPredicate.orPredicate(predicate1, predicate2);
     }
 
-    // Transformed
     /**
      * Creates a predicate that transforms the input object before passing it
      * to the predicate.
@@ -486,8 +488,7 @@ public class PredicateUtils {
      * @see TransformedPredicate
      * @since 3.1
      */
-    public static <T> Predicate<T> transformedPredicate(
-            final Transformer<? super T, ? extends T> transformer, final Predicate<? super T> predicate) {
+    public static <T> Predicate<T> transformedPredicate(final Transformer<? super T, ? extends T> transformer, final Predicate<? super T> predicate) {
         return TransformedPredicate.transformedPredicate(transformer, predicate);
     }
 
@@ -521,6 +522,8 @@ public class PredicateUtils {
     /**
      * Don't allow instances.
      */
-    private PredicateUtils() {}
+    private PredicateUtils() {
+        // empty
+    }
 
 }

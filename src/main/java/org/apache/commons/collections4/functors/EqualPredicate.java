@@ -17,6 +17,7 @@
 package org.apache.commons.collections4.functors;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.apache.commons.collections4.Equator;
 import org.apache.commons.collections4.Predicate;
@@ -25,15 +26,16 @@ import org.apache.commons.collections4.Predicate;
  * Predicate implementation that returns true if the input is the same object
  * as the one stored in this predicate by equals.
  *
+ * @param <T> the type of the input to the predicate.
  * @since 3.0
  */
-public final class EqualPredicate<T> implements Predicate<T>, Serializable {
+public final class EqualPredicate<T> extends AbstractPredicate<T> implements Serializable {
 
     /** Serial version UID */
     private static final long serialVersionUID = 5633766978029907089L;
 
     /**
-     * Factory to create the predicate.
+     * Creates the predicate.
      *
      * @param <T> the type that the predicate queries
      * @param object  the object to compare to
@@ -47,7 +49,7 @@ public final class EqualPredicate<T> implements Predicate<T>, Serializable {
     }
 
     /**
-     * Factory to create the identity predicate.
+     * Creates the identity predicate.
      *
      * @param <T> the type that the predicate queries
      * @param object  the object to compare to
@@ -63,7 +65,7 @@ public final class EqualPredicate<T> implements Predicate<T>, Serializable {
     }
 
     /** The value to compare to */
-    private final T iValue;
+    private final T test;
 
     /** The equator to use for comparison */
     private final Equator<T> equator;
@@ -84,27 +86,13 @@ public final class EqualPredicate<T> implements Predicate<T>, Serializable {
      * Constructor that performs no validation.
      * Use {@code equalPredicate} if you want that.
      *
-     * @param object  the object to compare to
+     * @param test  the object to compare to
      * @param equator  the equator to use for comparison
      * @since 4.0
      */
-    public EqualPredicate(final T object, final Equator<T> equator) {
-        iValue = object;
+    public EqualPredicate(final T test, final Equator<T> equator) {
+        this.test = test;
         this.equator = equator;
-    }
-
-    /**
-     * Evaluates the predicate returning true if the input equals the stored value.
-     *
-     * @param object  the input object
-     * @return true if input object equals stored value
-     */
-    @Override
-    public boolean evaluate(final T object) {
-        if (equator != null) {
-            return equator.equate(iValue, object);
-        }
-        return iValue.equals(object);
     }
 
     /**
@@ -114,7 +102,21 @@ public final class EqualPredicate<T> implements Predicate<T>, Serializable {
      * @since 3.1
      */
     public Object getValue() {
-        return iValue;
+        return test;
+    }
+
+    /**
+     * Evaluates the predicate returning true if the input equals the stored value.
+     *
+     * @param object  the input object
+     * @return true if input object equals stored value
+     */
+    @Override
+    public boolean test(final T object) {
+        if (equator != null) {
+            return equator.equate(test, object);
+        }
+        return Objects.equals(test, object);
     }
 
 }

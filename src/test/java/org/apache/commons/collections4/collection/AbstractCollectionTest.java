@@ -46,10 +46,11 @@ import java.util.function.Predicate;
 
 import org.apache.commons.collections4.AbstractObjectTest;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link java.util.Collection} methods and contracts.
+ * Tests {@link java.util.Collection}.
  * <p>
  * You should create a concrete subclass of this class to test any custom
  * {@link Collection} implementation.  At minimum, you'll have to
@@ -57,7 +58,7 @@ import org.junit.jupiter.api.Test;
  * and {@link #makeConfirmedFullCollection()} methods.
  * You might want to override some of the additional public methods as well:
  * <p>
- * <b>Element Population Methods</b>
+ * <strong>Element Population Methods</strong>
  * <p>
  * Override these if your collection restricts what kind of elements are
  * allowed (for instance, if {@code null} is not permitted):
@@ -66,7 +67,7 @@ import org.junit.jupiter.api.Test;
  * <li>{@link #getOtherElements()}
  * </ul>
  * <p>
- * <b>Supported Operation Methods</b>
+ * <strong>Supported Operation Methods</strong>
  * <p>
  * Override these if your collection doesn't support certain operations:
  * <ul>
@@ -77,19 +78,19 @@ import org.junit.jupiter.api.Test;
  * <li>{@link #isFailFastSupported()}
  * </ul>
  * <p>
- * <b>Indicate Collection Behaviour</b>
+ * <strong>Indicate Collection Behaviour</strong>
  * <p>
  * Override these if your collection makes specific behavior guarantees:
  * <ul>
  * <li>{@link #getIterationBehaviour()}</li>
  * </ul>
  * <p>
- * <b>Fixture Methods</b>
+ * <strong>Fixture Methods</strong>
  * <p>
  * Fixtures are used to verify that the operation results in correct state
  * for the collection.  Basically, the operation is performed against your
  * collection implementation, and an identical operation is performed against a
- * <i>confirmed</i> collection implementation.  A confirmed collection
+ * <em>confirmed</em> collection implementation.  A confirmed collection
  * implementation is something like {@link java.util.ArrayList}, which is
  * known to conform exactly to its collection interface's contract.  After the
  * operation takes place on both your collection implementation and the
@@ -130,7 +131,7 @@ import org.junit.jupiter.api.Test;
  * above methods, because those three classes already override the methods
  * to provide standard JDK confirmed collections.<P>
  * <p>
- * <b>Other notes</b>
+ * <strong>Other notes</strong>
  * <p>
  * If your {@link Collection} fails one of these tests by design,
  * you may still use this base set of cases.  Simply override the
@@ -259,15 +260,6 @@ public abstract class AbstractCollectionTest<E> extends AbstractObjectTest {
     private Collection<E> confirmed;
 
     /**
-     * JUnit constructor.
-     *
-     * @param testName  the test class name
-     */
-    public AbstractCollectionTest(final String testName) {
-        super(testName);
-    }
-
-    /**
      *  Specifies whether equal elements in the collection are, in fact,
      *  distinguishable with information not readily available.  That is, if a
      *  particular value is to be removed from the collection, then there is
@@ -313,11 +305,11 @@ public abstract class AbstractCollectionTest<E> extends AbstractObjectTest {
     /**
      *  Returns an array of objects that are contained in a collection
      *  produced by {@link #makeFullCollection()}.  Every element in the
-     *  returned array <I>must</I> be an element in a full collection.<P>
+     *  returned array <em>must</em> be an element in a full collection.<P>
      *  The default implementation returns a heterogeneous array of
      *  objects with some duplicates. null is added if allowed.
      *  Override if you require specific testing elements.  Note that if you
-     *  override {@link #makeFullCollection()}, you <I>must</I> override
+     *  override {@link #makeFullCollection()}, you <em>must</em> override
      *  this method to reflect the contents of a full collection.
      */
     @SuppressWarnings("unchecked")
@@ -341,7 +333,7 @@ public abstract class AbstractCollectionTest<E> extends AbstractObjectTest {
     @SuppressWarnings("unchecked")
     public E[] getFullNonNullElements() {
         return (E[]) new Object[] {
-            "",
+            StringUtils.EMPTY,
             "One",
             Integer.valueOf(2),
             "Three",
@@ -383,12 +375,12 @@ public abstract class AbstractCollectionTest<E> extends AbstractObjectTest {
      * @return the iteration behavior
      * @see #UNORDERED
      */
-    protected int getIterationBehaviour(){
+    protected int getIterationBehaviour() {
         return 0;
     }
 
     /**
-     *  Returns an array of elements that are <I>not</I> contained in a
+     *  Returns an array of elements that are <em>not</em> contained in a
      *  full collection.  Every element in the returned array must
      *  not exist in a collection returned by {@link #makeFullCollection()}.
      *  The default implementation returns a heterogeneous array of elements
@@ -824,9 +816,9 @@ public abstract class AbstractCollectionTest<E> extends AbstractObjectTest {
         }
 
         resetFull();
+        final Iterator<E> iter = getCollection().iterator();
+        getCollection().clear();
         try {
-            final Iterator<E> iter = getCollection().iterator();
-            getCollection().clear();
             iter.next();
             fail("next after clear should raise ConcurrentModification");
         } catch (final ConcurrentModificationException | NoSuchElementException e) {

@@ -17,29 +17,34 @@
 package org.apache.commons.collections4.bloomfilter;
 
 /**
- * A Hasher creates IndexProducer based on the hash implementation and the
- * provided Shape.
+ * A Hasher creates {@link IndexExtractor}s based on the hash implementation and the provided {@link Shape}.
  *
- * @since 4.5
+ * @since 4.5.0-M1
  */
 public interface Hasher {
 
     /**
-     * Creates an IndexProducer for this hasher based on the Shape.
+     * Creates an IndexExtractor for this hasher based on the Shape.
      *
-     * <p>The {@code IndexProducer} will create indices within the range defined by the number of bits in
-     * the shape. The total number of indices will respect the number of hash functions per item
-     * defined by the shape. However the count of indices may not be a multiple of the number of
-     * hash functions if the implementation has removed duplicates.</p>
+     * <p>
+     * The {@code IndexExtractor} will create indices within the range defined by the number of bits in the shape. The total number of indices will respect the
+     * number of hash functions per item defined by the shape. However the count of indices may not be a multiple of the number of hash functions if the
+     * implementation has removed duplicates.
+     * </p>
      *
-     * <p>This IndexProducer must be deterministic in that it must return the same indices for the
-     * same Shape.</p>
+     * <p>
+     * This IndexExtractor must be deterministic in that it must return the same indices for the same Shape.
+     * </p>
      *
-     * <p>No guarantee is made as to order of indices.</p>
-     * <p>Duplicates indices for a single item may be produced.</p>
+     * <p>
+     * No guarantee is made as to order of indices.
+     * </p>
+     * <p>
+     * Duplicates indices for a single item may be produced.
+     * </p>
      *
      * @param shape the shape of the desired Bloom filter.
      * @return the iterator of integers
      */
-    IndexProducer indices(Shape shape);
+    IndexExtractor indices(Shape shape);
 }

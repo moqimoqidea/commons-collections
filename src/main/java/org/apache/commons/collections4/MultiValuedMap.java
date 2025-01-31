@@ -128,7 +128,7 @@ public interface MultiValuedMap<K, V> {
     /**
      * Returns a view collection of the values associated with the specified key.
      * <p>
-     * This method will return an <b>empty</b> collection if {@link #containsKey(Object)}
+     * This method will return an <strong>empty</strong> collection if {@link #containsKey(Object)}
      * returns {@code false}. Changes to the returned collection will update the underlying
      * {@code MultiValuedMap} and vice-versa.
      * </p>
@@ -210,9 +210,9 @@ public interface MultiValuedMap<K, V> {
      * @param value  the value to add to the collection at the key
      * @return true if the map changed as a result of this put operation, or false
      *   if the map already contained the key-value mapping and the collection
-     *   type does not allow duplicate values, e.g. when using a Set
+     *   type does not allow duplicate values, for example when using a Set
      * @throws UnsupportedOperationException if the put operation is not supported by
-     *   this multivalued map, e.g. if it is unmodifiable
+     *   this multivalued map, for example if it is unmodifiable
      * @throws NullPointerException if the key or value is null and null is invalid (optional)
      * @throws IllegalArgumentException if some aspect of the specified key or value prevents
      *   it from being stored in this multivalued map
@@ -230,8 +230,6 @@ public interface MultiValuedMap<K, V> {
      *   null (optional)
      */
     boolean putAll(K key, Iterable<? extends V> values);
-
-    // Views
 
     /**
      * Copies all mappings from the specified map to this multivalued map
@@ -286,7 +284,7 @@ public interface MultiValuedMap<K, V> {
     /**
      * Removes all values associated with the specified key.
      * <p>
-     * The returned collection <i>may</i> be modifiable, but updates will not be propagated
+     * The returned collection <em>may</em> be modifiable, but updates will not be propagated
      * to this multivalued map. In case no mapping was stored for the specified
      * key, an empty, unmodifiable collection will be returned.
      * </p>

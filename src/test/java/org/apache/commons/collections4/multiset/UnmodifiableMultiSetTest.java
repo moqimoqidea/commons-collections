@@ -32,10 +32,6 @@ import org.junit.jupiter.api.Test;
  */
 public class UnmodifiableMultiSetTest<E> extends AbstractMultiSetTest<E> {
 
-    public UnmodifiableMultiSetTest() {
-        super(UnmodifiableMultiSetTest.class.getSimpleName());
-    }
-
     @Override
     public MultiSet<E> getCollection() {
         return super.getCollection();
@@ -96,8 +92,8 @@ public class UnmodifiableMultiSetTest<E> extends AbstractMultiSetTest<E> {
     @Test
     public void testEntrySet() {
         final MultiSet<E> multiset = makeFullCollection();
-        final MultiSet<E> unmodifiableMultiSet =  UnmodifiableMultiSet.unmodifiableMultiSet(multiset);
-        assertSame( unmodifiableMultiSet.entrySet().size(), multiset.entrySet().size());
+        final MultiSet<E> unmodifiableMultiSet = UnmodifiableMultiSet.unmodifiableMultiSet(multiset);
+        assertSame(unmodifiableMultiSet.entrySet().size(), multiset.entrySet().size());
     }
 
     @Test

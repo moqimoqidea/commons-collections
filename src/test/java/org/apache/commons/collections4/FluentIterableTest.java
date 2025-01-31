@@ -165,7 +165,7 @@ public class FluentIterableTest {
         final List<Integer> combinedList = new ArrayList<>();
         CollectionUtils.addAll(combinedList, iterableOdd);
         CollectionUtils.addAll(combinedList, iterableEven);
-        combinedList.sort(null);
+        Collections.sort(combinedList);
         assertEquals(combinedList, result);
 
         assertThrows(NullPointerException.class, () -> FluentIterable.of(iterableOdd).collate(null).toList(),
@@ -183,7 +183,7 @@ public class FluentIterableTest {
         final List<Integer> combinedList = new ArrayList<>();
         CollectionUtils.addAll(combinedList, iterableOdd);
         CollectionUtils.addAll(combinedList, iterableEven);
-        combinedList.sort(null);
+        Collections.sort(combinedList);
         assertEquals(combinedList, result);
 
         // null comparator is equivalent to natural ordering
@@ -273,7 +273,7 @@ public class FluentIterableTest {
 
     @Test
     public void testForEach() {
-        final AtomicInteger sum = new AtomicInteger(0);
+        final AtomicInteger sum = new AtomicInteger();
         final Closure<Integer> closure = sum::addAndGet;
 
         FluentIterable.of(iterableA).forEach(closure);
@@ -446,7 +446,7 @@ public class FluentIterableTest {
         List<Integer> combinedList = new ArrayList<>();
         CollectionUtils.addAll(combinedList, iterableOdd);
         CollectionUtils.addAll(combinedList, iterableEven);
-        combinedList.sort(null);
+        Collections.sort(combinedList);
         assertEquals(combinedList, result);
 
         assertThrows(NullPointerException.class, () -> FluentIterable.of(iterableOdd).zip((Iterable<Integer>) null).toList(),

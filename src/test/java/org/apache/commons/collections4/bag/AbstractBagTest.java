@@ -42,7 +42,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link org.apache.commons.collections4.Bag Bag} methods and contracts.
+ * Tests {@link org.apache.commons.collections4.Bag Bag}.
  * <p>
  * To use, simply extend this class, and implement
  * the {@link #makeObject} method.
@@ -51,7 +51,7 @@ import org.junit.jupiter.api.Test;
  * you may still use this base set of cases.  Simply override the
  * test case (method) your bag fails.
  * <p>
- * <b>Note:</b> The Bag interface does not conform to the Collection interface
+ * <strong>Note:</strong> The Bag interface does not conform to the Collection interface
  * so the generic collection tests from AbstractCollectionTest would normally fail.
  * As a work-around since 4.0, a CollectionBag decorator can be used
  * to make any Bag implementation comply to the Collection contract.
@@ -70,17 +70,13 @@ public abstract class AbstractBagTest<T> extends AbstractCollectionTest<T> {
 
     public class TestBagUniqueSet extends AbstractSetTest<T> {
 
-        public TestBagUniqueSet() {
-            super("");
-        }
-
         @Override
         public T[] getFullElements() {
             return AbstractBagTest.this.getFullElements();
         }
 
         @Override
-        protected int getIterationBehaviour(){
+        protected int getIterationBehaviour() {
             return AbstractBagTest.this.getIterationBehaviour();
         }
 
@@ -141,11 +137,8 @@ public abstract class AbstractBagTest<T> extends AbstractCollectionTest<T> {
 
     /**
      * JUnit constructor.
-     *
-     * @param testName  the test class name
      */
-    public AbstractBagTest(final String testName) {
-        super(testName);
+    public AbstractBagTest() {
     }
 
     /**
@@ -208,14 +201,14 @@ public abstract class AbstractBagTest<T> extends AbstractCollectionTest<T> {
 
     @Override
     public void resetEmpty() {
-        this.setCollection(CollectionBag.collectionBag(makeObject()));
-        this.setConfirmed(makeConfirmedCollection());
+        setCollection(CollectionBag.collectionBag(makeObject()));
+        setConfirmed(makeConfirmedCollection());
     }
 
     @Override
     public void resetFull() {
-        this.setCollection(CollectionBag.collectionBag(makeFullCollection()));
-        this.setConfirmed(makeConfirmedFullCollection());
+        setCollection(CollectionBag.collectionBag(makeFullCollection()));
+        setConfirmed(makeConfirmedFullCollection());
     }
 
     @Test

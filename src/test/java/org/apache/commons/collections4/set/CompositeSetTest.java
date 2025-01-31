@@ -35,10 +35,6 @@ import org.junit.jupiter.api.Test;
  */
 public class CompositeSetTest<E> extends AbstractSetTest<E> {
 
-    public CompositeSetTest() {
-        super(CompositeSetTest.class.getSimpleName());
-    }
-
     @SuppressWarnings("unchecked")
     public Set<E> buildOne() {
         final HashSet<E> set = new HashSet<>();
@@ -69,7 +65,7 @@ public class CompositeSetTest<E> extends AbstractSetTest<E> {
     public CompositeSet<E> makeObject() {
         final HashSet<E> contained = new HashSet<>();
         final CompositeSet<E> set = new CompositeSet<>(contained);
-        set.setMutator( new EmptySetMutator<>(contained) );
+        set.setMutator(new EmptySetMutator<>(contained));
         return set;
     }
 

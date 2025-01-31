@@ -33,15 +33,13 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the UnmodifiableIterator.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class UnmodifiableIteratorTest<E> extends AbstractIteratorTest<E> {
 
     protected String[] testArray = { "One", "Two", "Three" };
     protected List<E> testList;
-
-    public UnmodifiableIteratorTest() {
-        super(UnmodifiableIteratorTest.class.getSimpleName());
-    }
 
     @Override
     public Iterator<E> makeEmptyIterator() {
@@ -53,9 +51,6 @@ public class UnmodifiableIteratorTest<E> extends AbstractIteratorTest<E> {
         return UnmodifiableIterator.unmodifiableIterator(testList.iterator());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     @BeforeEach
     protected void setUp() throws Exception {

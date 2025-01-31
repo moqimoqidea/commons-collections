@@ -28,6 +28,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.IntFunction;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.iterators.ArrayIterator;
@@ -45,6 +50,7 @@ import org.apache.commons.collections4.iterators.FilterListIterator;
 import org.apache.commons.collections4.iterators.IteratorChain;
 import org.apache.commons.collections4.iterators.IteratorEnumeration;
 import org.apache.commons.collections4.iterators.IteratorIterable;
+import org.apache.commons.collections4.iterators.LazyIteratorChain;
 import org.apache.commons.collections4.iterators.ListIteratorWrapper;
 import org.apache.commons.collections4.iterators.LoopingIterator;
 import org.apache.commons.collections4.iterators.LoopingListIterator;
@@ -110,7 +116,6 @@ public class IteratorUtils {
      */
     private static final String DEFAULT_TOSTRING_DELIMITER = ", ";
 
-    // Arrays
     /**
      * Gets an iterator over an object array.
      *
@@ -159,6 +164,7 @@ public class IteratorUtils {
      * <p>
      * This method will handle primitive arrays as well as object arrays.
      * The primitives will be wrapped in the appropriate wrapper class.
+     * </p>
      *
      * @param <E> the element type
      * @param array  the array over which to iterate
@@ -175,6 +181,7 @@ public class IteratorUtils {
      * <p>
      * This method will handle primitive arrays as well as object arrays.
      * The primitives will be wrapped in the appropriate wrapper class.
+     * </p>
      *
      * @param <E> the element type
      * @param array  the array over which to iterate
@@ -194,6 +201,7 @@ public class IteratorUtils {
      * <p>
      * This method will handle primitive arrays as well as object arrays.
      * The primitives will be wrapped in the appropriate wrapper class.
+     * </p>
      *
      * @param <E> the element type
      * @param array  the array over which to iterate
@@ -255,6 +263,7 @@ public class IteratorUtils {
      * <p>
      * This method will handle primitive arrays as well as object arrays.
      * The primitives will be wrapped in the appropriate wrapper class.
+     * </p>
      *
      * @param <E> the element type
      * @param array  the array over which to iterate
@@ -271,6 +280,7 @@ public class IteratorUtils {
      * <p>
      * This method will handle primitive arrays as well as object arrays.
      * The primitives will be wrapped in the appropriate wrapper class.
+     * </p>
      *
      * @param <E> the element type
      * @param array  the array over which to iterate
@@ -289,6 +299,7 @@ public class IteratorUtils {
      * <p>
      * This method will handle primitive arrays as well as object arrays.
      * The primitives will be wrapped in the appropriate wrapper class.
+     * </p>
      *
      * @param <E> the element type
      * @param array  the array over which to iterate
@@ -329,7 +340,6 @@ public class IteratorUtils {
         return new IteratorIterable<>(iterator, false);
     }
 
-    // Views
     /**
      * Gets an iterator that provides an iterator view of the given enumeration.
      *
@@ -396,6 +406,7 @@ public class IteratorUtils {
      * <p>
      * The iterator is immediately advanced until it reaches the position at
      * {@code offset}, incurring O(n) time.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to decorate
@@ -421,7 +432,7 @@ public class IteratorUtils {
      * @throws NullPointerException if iterators collection is null or contains a null
      * @throws ClassCastException if the iterators collection contains the wrong object type
      */
-    public static <E> Iterator<E> chainedIterator(final Collection<Iterator<? extends E>> iterators) {
+    public static <E> Iterator<E> chainedIterator(final Collection<? extends Iterator<? extends E>> iterators) {
         return new IteratorChain<>(iterators);
     }
 
@@ -456,14 +467,37 @@ public class IteratorUtils {
     }
 
     /**
+     * Gets an iterator that iterates through an {@link Iterator} of Iterators one after another.
+     *
+     * @param <E>       the element type
+     * @param iterators the iterators to use, not null or empty or contain nulls
+     * @return a combination iterator over the iterators
+     * @throws NullPointerException if iterators collection is null or contains a null
+     * @throws ClassCastException   if the iterators collection contains the wrong object type
+     * @since 4.5.0-M3
+     */
+    public static <E> Iterator<E> chainedIterator(final Iterator<? extends Iterator<? extends E>> iterators) {
+        return new LazyIteratorChain<E>() {
+
+            @Override
+            protected Iterator<? extends E> nextIterator(final int count) {
+                return iterators.hasNext() ? iterators.next() : null;
+            }
+
+        };
+    }
+
+    /**
      * Gets an iterator that provides an ordered iteration over the elements
      * contained in a collection of {@link Iterator}s.
      * <p>
      * Given two ordered {@link Iterator}s {@code A} and {@code B},
      * the {@link Iterator#next()} method will return the lesser of
      * {@code A.next()} and {@code B.next()} and so on.
+     * </p>
      * <p>
      * The comparator is optional. If null is specified then natural order is used.
+     * </p>
      *
      * @param <E> the element type
      * @param comparator  the comparator to use, may be null for natural order
@@ -487,8 +521,10 @@ public class IteratorUtils {
      * Given two ordered {@link Iterator}s {@code A} and {@code B},
      * the {@link Iterator#next()} method will return the lesser of
      * {@code A.next()} and {@code B.next()} and so on.
+     * </p>
      * <p>
      * The comparator is optional. If null is specified then natural order is used.
+     * </p>
      *
      * @param <E> the element type
      * @param comparator  the comparator to use, may be null for natural order
@@ -504,7 +540,6 @@ public class IteratorUtils {
         return new CollatingIterator<>(comp, iterators);
     }
 
-    // Collated
     /**
      * Gets an iterator that provides an ordered iteration over the elements
      * contained in a collection of ordered {@link Iterator}s.
@@ -512,8 +547,10 @@ public class IteratorUtils {
      * Given two ordered {@link Iterator}s {@code A} and {@code B},
      * the {@link Iterator#next()} method will return the lesser of
      * {@code A.next()} and {@code B.next()}.
+     * </p>
      * <p>
      * The comparator is optional. If null is specified then natural order is used.
+     * </p>
      *
      * @param <E> the element type
      * @param comparator  the comparator to use, may be null for natural order
@@ -531,12 +568,11 @@ public class IteratorUtils {
         return new CollatingIterator<>(comp, iterator1, iterator2);
     }
 
-    // Chained
-
     /**
      * Checks if the object is contained in the given iterator.
      * <p>
      * A {@code null} or empty iterator returns false.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterator} contains
      * @param iterator  the iterator to check, may be null
@@ -548,11 +584,11 @@ public class IteratorUtils {
         return matchesAny(iterator, EqualPredicate.equalPredicate(object));
     }
 
-    // Empty
     /**
      * Gets an empty iterator.
      * <p>
      * This iterator is a valid iterator object that will iterate over nothing.
+     * </p>
      *
      * @param <E> the element type
      * @return an iterator over nothing
@@ -566,6 +602,7 @@ public class IteratorUtils {
      * <p>
      * This iterator is a valid list iterator object that will iterate
      * over nothing.
+     * </p>
      *
      * @param <E> the element type
      * @return a list iterator over nothing
@@ -579,6 +616,7 @@ public class IteratorUtils {
      * <p>
      * This iterator is a valid map iterator object that will iterate
      * over nothing.
+     * </p>
      *
      * @param <K> the key type
      * @param <V> the value type
@@ -593,6 +631,7 @@ public class IteratorUtils {
      * <p>
      * This iterator is a valid iterator object that will iterate
      * over nothing.
+     * </p>
      *
      * @param <E> the element type
      * @return an ordered iterator over nothing
@@ -606,6 +645,7 @@ public class IteratorUtils {
      * <p>
      * This iterator is a valid map iterator object that will iterate
      * over nothing.
+     * </p>
      *
      * @param <K> the key type
      * @param <V> the value type
@@ -615,12 +655,12 @@ public class IteratorUtils {
         return EmptyOrderedMapIterator.<K, V>emptyOrderedMapIterator();
     }
 
-    // Filtered
     /**
      * Gets an iterator that filters another iterator.
      * <p>
      * The returned iterator will only return objects that match the specified
      * filtering predicate.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to use, not null
@@ -640,6 +680,7 @@ public class IteratorUtils {
      * <p>
      * The returned iterator will only return objects that match the specified
      * filtering predicate.
+     * </p>
      *
      * @param <E> the element type
      * @param listIterator  the list iterator to use, not null
@@ -659,6 +700,7 @@ public class IteratorUtils {
      * Finds the first element in the given iterator which matches the given predicate.
      * <p>
      * A {@code null} or empty iterator returns null.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to search, may be null
@@ -668,17 +710,33 @@ public class IteratorUtils {
      * @since 4.1
      */
     public static <E> E find(final Iterator<E> iterator, final Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        return find(iterator, predicate, null);
+    }
 
+    /**
+     * Finds the first element in the given iterator which matches the given predicate.
+     * <p>
+     * A {@code null} or empty iterator returns {@code defaultValue}.
+     * </p>
+     *
+     * @param <E>          the element type.
+     * @param iterator     the iterator to search, may be null.
+     * @param predicate    the predicate to use, must not be null.
+     * @param defaultValue the default value, may be null.
+     * @return the first element of the iterator which matches the predicate or null if none could be found.
+     * @throws NullPointerException if predicate is null.
+     */
+    private static <E> E find(final Iterator<E> iterator, final Predicate<? super E> predicate, final E defaultValue) {
+        Objects.requireNonNull(predicate, "predicate");
         if (iterator != null) {
             while (iterator.hasNext()) {
                 final E element = iterator.next();
-                if (predicate.evaluate(element)) {
+                if (predicate.test(element)) {
                     return element;
                 }
             }
         }
-        return null;
+        return defaultValue;
     }
 
     /**
@@ -712,11 +770,9 @@ public class IteratorUtils {
      */
     public static <E> void forEach(final Iterator<E> iterator, final Closure<? super E> closure) {
         Objects.requireNonNull(closure, "closure");
-
         if (iterator != null) {
             while (iterator.hasNext()) {
-                final E element = iterator.next();
-                closure.execute(element);
+                closure.accept(iterator.next());
             }
         }
     }
@@ -725,6 +781,7 @@ public class IteratorUtils {
      * Executes the given closure on each but the last element in the iterator.
      * <p>
      * If the input iterator is null no change is made.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterator} contains
      * @param iterator  the iterator to get the input from, may be null
@@ -742,27 +799,45 @@ public class IteratorUtils {
                 if (!iterator.hasNext()) {
                     return element;
                 }
-                closure.execute(element);
+                closure.accept(element);
             }
         }
         return null;
     }
 
     /**
-     * Returns the {@code index}-th value in {@link Iterator}, throwing
-     * {@code IndexOutOfBoundsException} if there is no such element.
+     * Gets the {@code index}-th value in {@link Iterator}, throwing {@code IndexOutOfBoundsException} if there is no such element.
      * <p>
-     * The Iterator is advanced to {@code index} (or to the end, if
-     * {@code index} exceeds the number of entries) as a side effect of this method.
+     * The Iterator is advanced to {@code index} (or to the end, if {@code index} exceeds the number of entries) as a side effect of this method.
+     * </p>
      *
-     * @param <E> the type of object in the {@link Iterator}
-     * @param iterator  the iterator to get a value from
-     * @param index  the index to get
-     * @return the object at the specified index
-     * @throws IndexOutOfBoundsException if the index is invalid
+     * @param <E>      the type of object in the {@link Iterator}.
+     * @param iterator the iterator to get a value from.
+     * @param index    the index to get, 0-based.
+     * @return the object at the specified index.
+     * @throws IndexOutOfBoundsException if the index is invalid.
      * @since 4.1
      */
     public static <E> E get(final Iterator<E> iterator, final int index) {
+        return get(iterator, index, ioob -> {
+            throw new IndexOutOfBoundsException("Entry does not exist: " + ioob);
+        });
+    }
+
+    /**
+     * Gets the {@code index}-th value in {@link Iterator}, throwing {@code IndexOutOfBoundsException} if there is no such element.
+     * <p>
+     * The Iterator is advanced to {@code index} (or to the end, if {@code index} exceeds the number of entries) as a side effect of this method.
+     * </p>
+     *
+     * @param <E>             the type of object in the {@link Iterator}
+     * @param iterator        the iterator to get a value from
+     * @param index           the index to get, 0-based.
+     * @param defaultSupplier supplies a default value at an index.
+     * @return the object at the specified index
+     * @throws IndexOutOfBoundsException if the index is invalid
+     */
+    static <E> E get(final Iterator<E> iterator, final int index, final IntFunction<E> defaultSupplier) {
         int i = index;
         CollectionUtils.checkIndexBounds(i);
         while (iterator.hasNext()) {
@@ -772,13 +847,14 @@ public class IteratorUtils {
             }
             iterator.next();
         }
-        throw new IndexOutOfBoundsException("Entry does not exist: " + i);
+        return defaultSupplier.apply(i);
     }
 
     /**
      * Gets a suitable Iterator for the given object.
      * <p>
      * This method can handle objects as follows
+     * </p>
      * <ul>
      * <li>null - empty iterator
      * <li>Iterator - returned directly
@@ -841,13 +917,12 @@ public class IteratorUtils {
         return singletonIterator(obj);
     }
 
-    // Peeking
-
     /**
      * Returns the index of the first element in the specified iterator that
      * matches the given predicate.
      * <p>
      * A {@code null} or empty iterator returns -1.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to search, may be null
@@ -862,7 +937,7 @@ public class IteratorUtils {
         if (iterator != null) {
             for (int index = 0; iterator.hasNext(); index++) {
                 final E element = iterator.next();
-                if (predicate.evaluate(element)) {
+                if (predicate.test(element)) {
                     return index;
                 }
             }
@@ -870,12 +945,11 @@ public class IteratorUtils {
         return CollectionUtils.INDEX_NOT_FOUND;
     }
 
-    // Pushback
-
     /**
      * Checks if the given iterator is empty.
      * <p>
      * A {@code null} or empty iterator returns true.
+     * </p>
      *
      * @param iterator  the {@link Iterator} to use, may be null
      * @return true if the iterator is exhausted or null, false otherwise
@@ -885,13 +959,13 @@ public class IteratorUtils {
         return iterator == null || !iterator.hasNext();
     }
 
-    // Looping
     /**
      * Gets an iterator that loops continuously over the supplied collection.
      * <p>
      * The iterator will only stop looping if the remove method is called
      * enough times to empty the collection, or if the collection is empty
      * to start with.
+     * </p>
      *
      * @param <E> the element type
      * @param collection  the collection to iterate over, not null
@@ -907,6 +981,7 @@ public class IteratorUtils {
      * <p>
      * The iterator will only stop looping if the remove method is called
      * enough times to empty the list, or if the list is empty to start with.
+     * </p>
      *
      * @param <E> the element type
      * @param list  the list to iterate over, not null
@@ -922,6 +997,7 @@ public class IteratorUtils {
      * Answers true if a predicate is true for every element of an iterator.
      * <p>
      * A {@code null} or empty iterator returns true.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterator} contains
      * @param iterator  the {@link Iterator} to use, may be null
@@ -937,7 +1013,7 @@ public class IteratorUtils {
         if (iterator != null) {
             while (iterator.hasNext()) {
                 final E element = iterator.next();
-                if (!predicate.evaluate(element)) {
+                if (!predicate.test(element)) {
                     return false;
                 }
             }
@@ -949,6 +1025,7 @@ public class IteratorUtils {
      * Answers true if a predicate is true for any element of the iterator.
      * <p>
      * A {@code null} or empty iterator returns false.
+     * </p>
      *
      * @param <E> the type of object the {@link Iterator} contains
      * @param iterator  the {@link Iterator} to use, may be null
@@ -966,6 +1043,7 @@ public class IteratorUtils {
      * The returned {@link Iterator} can be used for a single iteration.
      * <p>
      * Convenience method, allows easy iteration over NodeLists:
+     * </p>
      * <pre>
      *   Iterator&lt;Node&gt; iterator = IteratorUtils.nodeListIterator(node);
      *   for (Node childNode : IteratorUtils.asIterable(iterator)) {
@@ -982,7 +1060,6 @@ public class IteratorUtils {
         return new NodeListIterator(Objects.requireNonNull(node, "node"));
     }
 
-    // org.w3c.dom.NodeList iterators
     /**
      * Gets an {@link Iterator} that wraps the specified {@link NodeList}.
      * The returned {@link Iterator} can be used for a single iteration.
@@ -996,7 +1073,6 @@ public class IteratorUtils {
         return new NodeListIterator(Objects.requireNonNull(nodeList, "nodeList"));
     }
 
-    // Object Graph
     /**
      * Gets an iterator that operates over an object graph.
      * <p>
@@ -1004,8 +1080,10 @@ public class IteratorUtils {
      * The iteration starts from a single root object.
      * It uses a {@code Transformer} to extract the iterators and elements.
      * Its main benefit is that no intermediate {@code List} is created.
+     * </p>
      * <p>
      * For example, consider an object graph:
+     * </p>
      * <pre>
      *                 |- Branch -- Leaf
      *                 |         \- Leaf
@@ -1017,8 +1095,10 @@ public class IteratorUtils {
      *         |- Tree |         /- Leaf
      *                 |- Branch -- Leaf
      *                 |- Branch -- Leaf</pre>
+     * <p>
      * The following {@code Transformer}, used in this class, will extract all
      * the Leaf objects without creating a combined intermediate list:
+     * </p>
      * <pre>
      * public Object transform(Object input) {
      *   if (input instanceof Forest) {
@@ -1041,9 +1121,11 @@ public class IteratorUtils {
      * either an iterator or an object. If the object is an Iterator, the next element
      * from that iterator is obtained and the process repeats. If the element is an object
      * it is returned.
+     * </p>
      * <p>
      * Under many circumstances, linking Iterators together in this manner is
      * more efficient (and convenient) than using nested for loops to extract a list.
+     * </p>
      *
      * @param <E> the element type
      * @param root  the root object to start iterating from, null results in an empty iterator
@@ -1082,12 +1164,12 @@ public class IteratorUtils {
         return PushbackIterator.pushbackIterator(iterator);
     }
 
-    // Singleton
     /**
      * Gets a singleton iterator.
      * <p>
      * This iterator is a valid iterator object that will iterate over
      * the specified object.
+     * </p>
      *
      * @param <E> the element type
      * @param object  the single object over which to iterate
@@ -1102,6 +1184,7 @@ public class IteratorUtils {
      * <p>
      * This iterator is a valid list iterator object that will iterate over
      * the specified object.
+     * </p>
      *
      * @param <E> the element type
      * @param object  the single object over which to iterate
@@ -1115,6 +1198,7 @@ public class IteratorUtils {
      * Returns the number of elements contained in the given iterator.
      * <p>
      * A {@code null} or empty iterator returns {@code 0}.
+     * </p>
      *
      * @param iterator  the iterator to check, may be null
      * @return the number of elements contained in the iterator
@@ -1131,7 +1215,6 @@ public class IteratorUtils {
         return size;
     }
 
-    // Skipping
     /**
      * Decorates the specified iterator to skip the first N elements.
      *
@@ -1148,10 +1231,35 @@ public class IteratorUtils {
     }
 
     /**
+     * Creates a stream on the given Iterable.
+     *
+     * @param <E> the type of elements in the Iterable.
+     * @param iterable the Iterable to stream or null.
+     * @return a new Stream or {@link Stream#empty()} if the Iterable is null.
+     * @since 4.5.0-M3
+     */
+    public static <E> Stream<E> stream(final Iterable<E> iterable) {
+        return iterable == null ? Stream.empty() : StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    /**
+     * Creates a stream on the given Iterator.
+     *
+     * @param <E> the type of elements in the Iterator.
+     * @param iterator the Iterator to stream or null.
+     * @return a new Stream or {@link Stream#empty()} if the Iterator is null.
+     * @since 4.5.0-M3
+     */
+    public static <E> Stream<E> stream(final Iterator<E> iterator) {
+        return iterator == null ? Stream.empty() : StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
+    }
+
+    /**
      * Gets an array based on an iterator.
      * <p>
      * As the wrapped Iterator is traversed, an ArrayList of its values is
      * created. At the end, this is converted to an array.
+     * </p>
      *
      * @param iterator  the iterator to use, not null
      * @return an array of the iterator contents
@@ -1168,6 +1276,7 @@ public class IteratorUtils {
      * <p>
      * As the wrapped Iterator is traversed, an ArrayList of its values is
      * created. At the end, this is converted to an array.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to use, not null
@@ -1185,13 +1294,12 @@ public class IteratorUtils {
         return list.toArray(array);
     }
 
-    // Utility methods
-
     /**
      * Gets a list based on an iterator.
      * <p>
      * As the wrapped Iterator is traversed, an ArrayList of its values is
      * created. At the end, the list is returned.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to use, not null
@@ -1207,6 +1315,7 @@ public class IteratorUtils {
      * <p>
      * As the wrapped Iterator is traversed, an ArrayList of its values is
      * created. At the end, the list is returned.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to use, not null
@@ -1232,6 +1341,7 @@ public class IteratorUtils {
      * <p>
      * As the wrapped Iterator is traversed, a LinkedList of its values is
      * cached, permitting all required operations of ListIterator.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to use, may not be null
@@ -1250,6 +1360,7 @@ public class IteratorUtils {
      * enclosed in square brackets ({@code "[]"}). Adjacent elements are separated
      * by the characters {@code ", "} (a comma followed by a space). Elements are
      * converted to strings as by {@code String.valueOf(Object)}.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to convert to a string, may be null
@@ -1269,6 +1380,7 @@ public class IteratorUtils {
      * enclosed in square brackets ({@code "[]"}). Adjacent elements are separated
      * by the characters {@code ", "} (a comma followed by a space). Elements are
      * converted to strings as by using the provided {@code transformer}.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to convert to a string, may be null
@@ -1290,6 +1402,7 @@ public class IteratorUtils {
      * enclosed by the provided {@code prefix} and {@code suffix}. Adjacent elements
      * are separated by the provided {@code delimiter}. Elements are converted to
      * strings as by using the provided {@code transformer}.
+     * </p>
      *
      * @param <E> the element type
      * @param iterator  the iterator to convert to a string, may be null
@@ -1314,7 +1427,7 @@ public class IteratorUtils {
         if (iterator != null) {
             while (iterator.hasNext()) {
                 final E element = iterator.next();
-                stringBuilder.append(transformer.transform(element));
+                stringBuilder.append(transformer.apply(element));
                 stringBuilder.append(delimiter);
             }
             if (stringBuilder.length() > prefix.length()) {
@@ -1325,12 +1438,12 @@ public class IteratorUtils {
         return stringBuilder.toString();
     }
 
-    // Transformed
     /**
      * Gets an iterator that transforms the elements of another iterator.
      * <p>
      * The transformation occurs during the next() method and the underlying
      * iterator is unaffected by the transformation.
+     * </p>
      *
      * @param <I> the input type
      * @param <O> the output type
@@ -1347,7 +1460,6 @@ public class IteratorUtils {
         return new TransformIterator<>(iterator, transformer);
     }
 
-    // Unmodifiable
     /**
      * Gets an immutable version of an {@link Iterator}. The returned object
      * will always throw an {@link UnsupportedOperationException} for
@@ -1402,7 +1514,6 @@ public class IteratorUtils {
         return new ZippingIterator<>(iterators);
     }
 
-    // Zipping
     /**
      * Returns an iterator that interleaves elements from the decorated iterators.
      *
@@ -1438,6 +1549,8 @@ public class IteratorUtils {
     /**
      * Don't allow instances.
      */
-    private IteratorUtils() {}
+    private IteratorUtils() {
+        // empty
+    }
 
 }

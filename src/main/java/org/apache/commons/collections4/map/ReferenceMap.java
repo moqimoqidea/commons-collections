@@ -47,7 +47,7 @@ import java.io.Serializable;
  * It differs in that keys and values in this class are compared using {@code equals()}.
  * </p>
  * <p>
- * This {@link java.util.Map Map} implementation does <i>not</i> allow null elements.
+ * This {@link java.util.Map Map} implementation does <em>not</em> allow null elements.
  * Attempting to add a null key or value to the map will raise a {@code NullPointerException}.
  * </p>
  * <p>
@@ -75,7 +75,6 @@ import java.io.Serializable;
  *
  * @param <K> the type of the keys in the map
  * @param <V> the type of the values in the map
- *
  * @see java.lang.ref.Reference
  * @since 3.0 (previously in main package v2.1)
  */
@@ -174,11 +173,11 @@ public class ReferenceMap<K, V> extends AbstractReferenceMap<K, V> implements Se
     }
 
     /**
-     * Read the map in using a custom routine.
+     * Deserializes the map in using a custom routine.
      *
      * @param in the input stream
      * @throws IOException if an error occurs while reading from the stream
-     * @throws ClassNotFoundException if an object read from the stream can not be loaded
+     * @throws ClassNotFoundException if an object read from the stream cannot be loaded
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -186,10 +185,10 @@ public class ReferenceMap<K, V> extends AbstractReferenceMap<K, V> implements Se
     }
 
     /**
-     * Write the map out using a custom routine.
+     * Serializes this object to an ObjectOutputStream.
      *
-     * @param out  the output stream
-     * @throws IOException if an error occurs while writing to the stream
+     * @param out the target ObjectOutputStream.
+     * @throws IOException thrown when an I/O errors occur writing to the target stream.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

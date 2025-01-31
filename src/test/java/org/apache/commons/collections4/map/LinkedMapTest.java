@@ -19,6 +19,7 @@ package org.apache.commons.collections4.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,18 +35,17 @@ import org.junit.jupiter.api.Test;
 
 /**
  * JUnit tests.
+ *
+ * @param <K> the key type.
+ * @param <V> the value type.
  */
 public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
     public class TestListView extends AbstractListTest<K> {
 
-        TestListView() {
-            super("TestListView");
-        }
-
         @Override
         public K[] getFullElements() {
-            return LinkedMapTest.this.getSampleKeys();
+            return getSampleKeys();
         }
 
         @Override
@@ -55,32 +55,33 @@ public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
 
         @Override
         public boolean isNullSupported() {
-            return LinkedMapTest.this.isAllowNullKey();
+            return isAllowNullKey();
         }
+
         @Override
         public boolean isRemoveSupported() {
             return false;
         }
+
         @Override
         public boolean isSetSupported() {
             return false;
         }
+
         @Override
         public boolean isTestSerialization() {
             return false;
         }
+
         @Override
         public List<K> makeFullCollection() {
             return LinkedMapTest.this.makeFullMap().asList();
         }
+
         @Override
         public List<K> makeObject() {
             return LinkedMapTest.this.makeObject().asList();
         }
-    }
-
-    public LinkedMapTest() {
-        super(LinkedMapTest.class.getSimpleName());
     }
 
     public BulkTest bulkTestListView() {
@@ -126,23 +127,12 @@ public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     @Test
     public void testGetByIndex() {
         resetEmpty();
-        LinkedMap<K, V> lm = getMap();
-        try {
-            lm.get(0);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lm.get(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().get(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().get(-1));
         resetFull();
-        lm = getMap();
-        try {
-            lm.get(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lm.get(lm.size());
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        final LinkedMap<K, V> lm = getMap();
+        assertThrows(IndexOutOfBoundsException.class, () -> lm.get(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> lm.get(lm.size()));
         int i = 0;
         for (final MapIterator<K, V> it = lm.mapIterator(); it.hasNext(); i++) {
             assertSame(it.next(), lm.get(i));
@@ -152,23 +142,12 @@ public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     @Test
     public void testGetValueByIndex() {
         resetEmpty();
-        LinkedMap<K, V> lm = getMap();
-        try {
-            lm.getValue(0);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lm.getValue(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().getValue(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().getValue(-1));
         resetFull();
-        lm = getMap();
-        try {
-            lm.getValue(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lm.getValue(lm.size());
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        final LinkedMap<K, V> lm = getMap();
+        assertThrows(IndexOutOfBoundsException.class, () -> lm.getValue(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> lm.getValue(lm.size()));
         int i = 0;
         for (final MapIterator<K, V> it = lm.mapIterator(); it.hasNext(); i++) {
             it.next();
@@ -260,23 +239,12 @@ public class LinkedMapTest<K, V> extends AbstractOrderedMapTest<K, V> {
     @Test
     public void testRemoveByIndex() {
         resetEmpty();
-        LinkedMap<K, V> lm = getMap();
-        try {
-            lm.remove(0);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lm.remove(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().remove(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMap().remove(-1));
         resetFull();
-        lm = getMap();
-        try {
-            lm.remove(-1);
-        } catch (final IndexOutOfBoundsException ex) {}
-        try {
-            lm.remove(lm.size());
-        } catch (final IndexOutOfBoundsException ex) {}
-
+        final LinkedMap<K, V> lm = getMap();
+        assertThrows(IndexOutOfBoundsException.class, () -> lm.remove(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> lm.remove(lm.size()));
         final List<K> list = new ArrayList<>();
         for (final MapIterator<K, V> it = lm.mapIterator(); it.hasNext();) {
             list.add(it.next());

@@ -29,10 +29,6 @@ import org.apache.commons.collections4.SortedBag;
  */
 public abstract class AbstractSortedBagTest<T> extends AbstractBagTest<T> {
 
-    public AbstractSortedBagTest(final String testName) {
-        super(testName);
-    }
-
     /**
      * Returns the {@link #collection} field cast to a {@link SortedBag}.
      *
@@ -105,14 +101,14 @@ public abstract class AbstractSortedBagTest<T> extends AbstractBagTest<T> {
 
     @Override
     public void resetEmpty() {
-        this.setCollection(CollectionSortedBag.collectionSortedBag(makeObject()));
-        this.setConfirmed(makeConfirmedCollection());
+        setCollection(CollectionSortedBag.collectionSortedBag(makeObject()));
+        setConfirmed(makeConfirmedCollection());
     }
 
     @Override
     public void resetFull() {
-        this.setCollection(CollectionSortedBag.collectionSortedBag(makeFullCollection()));
-        this.setConfirmed(makeConfirmedFullCollection());
+        setCollection(CollectionSortedBag.collectionSortedBag(makeFullCollection()));
+        setConfirmed(makeConfirmedFullCollection());
     }
 
     /**

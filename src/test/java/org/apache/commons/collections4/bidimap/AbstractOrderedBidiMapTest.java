@@ -34,19 +34,15 @@ import org.apache.commons.collections4.iterators.AbstractMapIteratorTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Abstract test class for {@link OrderedBidiMap} methods and contracts.
+ * Tests {@link OrderedBidiMap}.
  */
 public abstract class AbstractOrderedBidiMapTest<K, V> extends AbstractBidiMapTest<K, V> {
 
     public class TestBidiOrderedMapIterator extends AbstractMapIteratorTest<K, V> {
 
-        public TestBidiOrderedMapIterator() {
-            super("TestBidiOrderedMapIterator");
-        }
-
         @Override
         public V[] addSetValues() {
-            return AbstractOrderedBidiMapTest.this.getNewSampleValues();
+            return getNewSampleValues();
         }
 
         @Override
@@ -75,12 +71,12 @@ public abstract class AbstractOrderedBidiMapTest<K, V> extends AbstractBidiMapTe
 
         @Override
         public boolean supportsRemove() {
-            return AbstractOrderedBidiMapTest.this.isRemoveSupported();
+            return isRemoveSupported();
         }
 
         @Override
         public boolean supportsSetValue() {
-            return AbstractOrderedBidiMapTest.this.isSetValueSupported();
+            return isSetValueSupported();
         }
 
         @Override
@@ -89,13 +85,6 @@ public abstract class AbstractOrderedBidiMapTest<K, V> extends AbstractBidiMapTe
             AbstractOrderedBidiMapTest.this.verify();
         }
 
-    }
-
-    public AbstractOrderedBidiMapTest() {
-    }
-
-    public AbstractOrderedBidiMapTest(final String testName) {
-        super(testName);
     }
 
     public BulkTest bulkTestOrderedMapIterator() {
@@ -149,7 +138,9 @@ public abstract class AbstractOrderedBidiMapTest<K, V> extends AbstractBidiMapTe
         if (!isAllowNullKey()) {
             try {
                 assertNull(bidi.nextKey(null)); // this is allowed too
-            } catch (final NullPointerException ex) {}
+            } catch (final NullPointerException ignore) {
+                // ignore
+            }
         } else {
             assertNull(bidi.nextKey(null));
         }
@@ -182,7 +173,9 @@ public abstract class AbstractOrderedBidiMapTest<K, V> extends AbstractBidiMapTe
         if (!isAllowNullKey()) {
             try {
                 assertNull(bidi.previousKey(null)); // this is allowed too
-            } catch (final NullPointerException ex) {}
+            } catch (final NullPointerException ignore) {
+                // ignore
+            }
         } else {
             assertNull(bidi.previousKey(null));
         }

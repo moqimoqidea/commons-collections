@@ -16,21 +16,28 @@
  */
 package org.apache.commons.collections4.iterators;
 
-import static org.apache.commons.collections4.functors.TruePredicate.truePredicate;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.functors.FalsePredicate;
 import org.apache.commons.collections4.functors.NotNullPredicate;
+import org.apache.commons.collections4.functors.TruePredicate;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,17 +45,16 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test the filter iterator.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
 public class FilterIteratorTest<E> extends AbstractIteratorTest<E> {
 
-    private String[] array;
+    private static final List<Integer> collectionInts = Arrays.asList(1, 2, 3, 4, 5, 6);
 
+    private String[] array;
     private List<E> list;
     private FilterIterator<E> iterator;
-    /** Creates new TestFilterIterator */
-    public FilterIteratorTest() {
-        super(FilterIteratorTest.class.getSimpleName());
-    }
 
     private void initIterator() {
         iterator = makeObject();
@@ -120,6 +126,101 @@ public class FilterIteratorTest<E> extends AbstractIteratorTest<E> {
     }
 
     @Test
+    public void testAddTo() {
+        final List<E> expected = new ArrayList<>(list);
+        expected.addAll(list);
+        final FilterIterator<E> filterIterator = new FilterIterator<>(list.iterator());
+        final List<E> actual = filterIterator.addTo(new ArrayList<>(list));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testAddToCollection() {
+        final List<E> expected = new ArrayList<>(list);
+        expected.addAll(list);
+        final FilterIterator<E> filterIterator = new FilterIterator<>(list.iterator());
+        final List<E> actual = filterIterator.toCollection(() -> new ArrayList<>(list));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testAddToEmpty() {
+        final FilterIterator<E> filterIterator = makeEmptyIterator();
+        final List<E> actual = filterIterator.addTo(new ArrayList<>(list));
+        assertEquals(list, actual);
+    }
+
+    @Test
+    public void testAddToEmptyToEmpty() {
+        final FilterIterator<E> filterIterator = makeEmptyIterator();
+        final List<E> actual = filterIterator.addTo(new ArrayList<>());
+        assertTrue(actual.isEmpty());
+    }
+
+    /**
+     * Tests a predicate that accepts some but not all elements.
+     */
+    @Test
+    public void testConstructorPredicateFilterInts() {
+        final List<Integer> expected = Arrays.asList(2, 4, 6);
+        final Predicate<Integer> predicate = i -> i % 2 == 0;
+        final FilterIterator<Integer> filter = new FilterIterator<>(collectionInts.iterator(), predicate);
+        final List<Integer> actual = new ArrayList<>();
+        filter.forEachRemaining(actual::add);
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Tests a predicate that accepts everything.
+     */
+    @Test
+    public void testForEachRemainingAcceptAllCtor() {
+        final List<E> expected = IteratorUtils.toList(makeObject());
+        final FilterIterator<E> it = new FilterIterator<>(makeObject(), TruePredicate.truePredicate());
+        final List<E> actual = new ArrayList<>();
+        it.forEachRemaining(actual::add);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testForEachRemainingDefaultCtor() {
+        final List<E> expected = IteratorUtils.toList(makeObject());
+        final FilterIterator<E> it = new FilterIterator<>();
+        it.setIterator(expected.iterator());
+        final List<E> actual = new ArrayList<>();
+        it.forEachRemaining(actual::add);
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Tests a predicate that rejects everything.
+     */
+    @Test
+    public void testForEachRemainingRejectAllCtor() {
+        final List<E> expected = IteratorUtils.toList(makeObject());
+        final FilterIterator<E> it = new FilterIterator<>(makeObject(), FalsePredicate.falsePredicate());
+        final List<E> actual = new ArrayList<>();
+        it.forEachRemaining(actual::add);
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void testRemoveNext() {
+        final FilterIterator<E> iter = makeObject();
+        final E i = iter.removeNext();
+        assertFalse(list.contains(i));
+        final List<E> actual = new ArrayList<>();
+        iter.forEachRemaining(actual::add);
+        assertEquals(list, actual);
+    }
+
+    @Test
+    public void testRemoveNextEmpty() {
+        final FilterIterator<E> empty = makeEmptyIterator();
+        assertThrows(NoSuchElementException.class, empty::removeNext);
+    }
+
+    @Test
     public void testRepeatedHasNext() {
         for (int i = 0; i <= array.length; i++) {
             assertTrue(iterator.hasNext());
@@ -158,7 +259,7 @@ public class FilterIteratorTest<E> extends AbstractIteratorTest<E> {
         final Iterator<E> iter2 = Collections.<E>emptyList().iterator();
 
         final FilterIterator<E> filterIterator = new FilterIterator<>(iter1);
-        filterIterator.setPredicate(truePredicate());
+        filterIterator.setPredicate(TruePredicate.truePredicate());
         // this iterator has elements
         assertTrue(filterIterator.hasNext());
 
@@ -176,13 +277,37 @@ public class FilterIteratorTest<E> extends AbstractIteratorTest<E> {
         final Iterator<E> iter = Collections.singleton((E) null).iterator();
 
         final FilterIterator<E> filterIterator = new FilterIterator<>(iter);
-        filterIterator.setPredicate(truePredicate());
+        filterIterator.setPredicate(TruePredicate.truePredicate());
         // this predicate matches
         assertTrue(filterIterator.hasNext());
 
         // this predicate doesn't match
         filterIterator.setPredicate(NotNullPredicate.notNullPredicate());
         assertFalse(filterIterator.hasNext());
+    }
+
+    @Test
+    public void testToCollectionAsDeque() {
+        final Deque<E> expected = new ArrayDeque<>(list);
+        final FilterIterator<E> filterIterator = new FilterIterator<>(list.iterator());
+        final Deque<E> actual = filterIterator.toCollection(ArrayDeque::new);
+        assertArrayEquals(expected.toArray(), actual.toArray());
+    }
+
+    @Test
+    public void testToList() {
+        final List<E> expected = new ArrayList<>(list);
+        final FilterIterator<E> filterIterator = new FilterIterator<>(list.iterator());
+        final List<E> actual = filterIterator.toList();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testToSet() {
+        final Set<E> expected = new HashSet<>(list);
+        final FilterIterator<E> filterIterator = new FilterIterator<>(list.iterator());
+        final Set<E> actual = filterIterator.toSet();
+        assertEquals(expected, actual);
     }
 
     private void verifyElementsInPredicate(final String[] elements) {

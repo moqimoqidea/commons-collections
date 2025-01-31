@@ -31,6 +31,7 @@ import org.apache.commons.collections4.BulkTest;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.functors.NOPTransformer;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,19 +46,14 @@ public class TransformedSplitMapTest extends BulkTest {
 
     private final Transformer<String, Integer> stringToInt = Integer::valueOf;
 
-    public TransformedSplitMapTest() {
-        super(TransformedSplitMapTest.class.getSimpleName());
-    }
-
     @Test
     public void testEmptyMap() throws IOException, ClassNotFoundException {
         final TransformedSplitMap<String, String, String, String> map =
                 TransformedSplitMap.transformingMap(new HashMap<>(),
                                                     NOPTransformer.<String>nopTransformer(),
-                                                    NOPTransformer.<String>nopTransformer() );
+                                                    NOPTransformer.<String>nopTransformer());
 
-        final ObjectInputStream in =
-                new ObjectInputStream( new FileInputStream( TEST_DATA_PATH+"/TransformedSplitMap.emptyCollection.version4.obj" ) );
+        final ObjectInputStream in = new ObjectInputStream(new FileInputStream(TEST_DATA_PATH + "/TransformedSplitMap.emptyCollection.version4.obj"));
         final Object readObject = in.readObject();
         in.close();
 
@@ -68,23 +64,20 @@ public class TransformedSplitMapTest extends BulkTest {
 
     @Test
     public void testFullMap() throws IOException, ClassNotFoundException {
-        final TransformedSplitMap<String, String, String, String> map = TransformedSplitMap.transformingMap(
-                new HashMap<>(),
-                NOPTransformer.<String>nopTransformer(),
-                NOPTransformer.<String>nopTransformer() );
-        map.put( "a", "b" );
-        map.put( "c", "d" );
-        map.put( "e", "f" );
-        map.put( "g", "h" );
+        final TransformedSplitMap<String, String, String, String> map = TransformedSplitMap.transformingMap(new HashMap<>(),
+                NOPTransformer.<String>nopTransformer(), NOPTransformer.<String>nopTransformer());
+        map.put("a", "b");
+        map.put("c", "d");
+        map.put("e", "f");
+        map.put("g", "h");
 
-        final ObjectInputStream in =
-                new ObjectInputStream( new FileInputStream( TEST_DATA_PATH+"TransformedSplitMap.fullCollection.version4.obj" ) );
+        final ObjectInputStream in = new ObjectInputStream(new FileInputStream(TEST_DATA_PATH + "TransformedSplitMap.fullCollection.version4.obj"));
         final Object readObject = in.readObject();
         in.close();
 
         final TransformedSplitMap<?, ?, ?, ?> readMap = (TransformedSplitMap<?, ?, ?, ?>) readObject;
         assertFalse(readMap.isEmpty(), "Map should not be empty");
-        assertEquals( map.entrySet(), readMap.entrySet() );
+        assertEquals(map.entrySet(), readMap.entrySet());
     }
 
     @Test
@@ -110,7 +103,7 @@ public class TransformedSplitMapTest extends BulkTest {
                 new HashMap<>(), intToString, objectToClass);
 
         final Integer[] k = { 0, 1, 2, 3, 4, 5, 6 };
-        final Object[] v = { "", new Object(), new HashMap<>(), 0, BigInteger.TEN, null,
+        final Object[] v = { StringUtils.EMPTY, new Object(), new HashMap<>(), 0, BigInteger.TEN, null,
             new Object[0] };
 
         assertEquals(0, map.size());
@@ -151,19 +144,19 @@ public class TransformedSplitMapTest extends BulkTest {
 //        TransformedSplitMap<String, String, String, String> map = TransformedSplitMap.transformingMap(
 //                new HashMap<String, String>(),
 //                NOPTransformer.<String>nopTransformer(),
-//                NOPTransformer.<String>nopTransformer() );
+//                NOPTransformer.<String>nopTransformer());
 //
 //        ObjectOutputStream out = new ObjectOutputStream(
-//                new FileOutputStream( "src/test/resources/data/test/TransformedSplitMap.emptyCollection.version4.obj" ) );
-//        out.writeObject( map );
+//                new FileOutputStream("src/test/resources/data/test/TransformedSplitMap.emptyCollection.version4.obj"));
+//        out.writeObject(map);
 //
-//        map.put( "a", "b" );
-//        map.put( "c", "d" );
-//        map.put( "e", "f" );
-//        map.put( "g", "h" );
+//        map.put("a", "b");
+//        map.put("c", "d");
+//        map.put("e", "f");
+//        map.put("g", "h");
 //
 //        out = new ObjectOutputStream(
-//                new FileOutputStream( "src/test/resources/data/test/TransformedSplitMap.fullCollection.version4.obj" ) );
-//        out.writeObject( map );
+//                new FileOutputStream("src/test/resources/data/test/TransformedSplitMap.fullCollection.version4.obj"));
+//        out.writeObject(map);
 //    }
 }

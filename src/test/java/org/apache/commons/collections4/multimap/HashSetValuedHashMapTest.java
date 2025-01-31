@@ -32,13 +32,9 @@ import org.apache.commons.collections4.collection.AbstractCollectionTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test HashSetValuedHashMap
+ * Tests {@link HashSetValuedHashMap}.
  */
 public class HashSetValuedHashMapTest<K, V> extends AbstractMultiValuedMapTest<K, V> {
-
-    public HashSetValuedHashMapTest() {
-        super(HashSetValuedHashMapTest.class.getSimpleName());
-    }
 
     @Override
     protected int getIterationBehaviour() {
@@ -61,7 +57,7 @@ public class HashSetValuedHashMapTest<K, V> extends AbstractMultiValuedMapTest<K
     }
 
     @Test
-    public void testHashSetValuedHashMap_2(){
+    public void testHashSetValuedHashMap_2() {
         final Map<K, V> map = new HashMap<>();
         final SetValuedMap<K, V> map1;
         final SetValuedMap<K, V> map2;
@@ -193,9 +189,9 @@ public class HashSetValuedHashMapTest<K, V> extends AbstractMultiValuedMapTest<K
 
 //    public void testCreate() throws Exception {
 //        writeExternalFormToDisk((java.io.Serializable) makeObject(),
-//                "src/test/resources/data/test/HashSetValuedHashMap.emptyCollection.version4.1.obj");
+//                "src/test/resources/org/apache/commons/collections4/data/test/HashSetValuedHashMap.emptyCollection.version4.1.obj");
 //        writeExternalFormToDisk((java.io.Serializable) makeFullMap(),
-//                "src/test/resources/data/test/HashSetValuedHashMap.fullCollection.version4.1.obj");
+//                "src/test/resources/org/apache/commons/collections4/data/test/HashSetValuedHashMap.fullCollection.version4.1.obj");
 //    }
 
 }
